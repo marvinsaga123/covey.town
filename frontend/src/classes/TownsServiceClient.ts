@@ -102,7 +102,7 @@ export default class TownsServiceClient {
    */
   constructor(serviceURL?: string) {
     const baseURL = serviceURL || process.env.REACT_APP_TOWNS_SERVICE_URL;
-    assert(baseURL);
+    // assert(baseURL);
     this._axios = axios.create({ baseURL });
   }
 
