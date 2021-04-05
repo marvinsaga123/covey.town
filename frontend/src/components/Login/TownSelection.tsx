@@ -17,6 +17,7 @@ import {
   FormLabel,
   Heading,
   Input,
+  InputRightElement,
   Icon,
   HStack,
   Stack,
@@ -42,6 +43,10 @@ interface TownSelectionProps {
 export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Element {
   const [userName, setUserName] = useState<string>(Video.instance()?.userName || '');
   const [newTownName, setNewTownName] = useState<string>('');
+  const [show, setShow] = useState<boolean>(false);
+  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const handleShow = () => setShow(!show);
+  const handleShowConfirmation = () => setShowConfirmation(!showConfirmation);
   const [newTownIsPublic, setNewTownIsPublic] = useState<boolean>(true);
   const [townIDToJoin, setTownIDToJoin] = useState<string>('');
   const [currentPublicTowns, setCurrentPublicTowns] = useState<CoveyTownInfo[]>();
@@ -109,21 +114,24 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
     }
     let capital = false;
     let number = false;
+    let regularCharacter = false;
     let specialCharacter = false;
-    const chars = [...userPassword];
-    chars.forEach((c) => {
-      const num = parseInt(c,2);
-      if (num >= 48 && num <= 57) {
+    for (let index = 0; index < userPassword.length; index+= 1) {
+      const num = userPassword.charAt(index);
+      if (num >= '0' && num <= '9') {
         number = true;
       }
-      else if ((num >= 33 && num <= 47) || (num >= 58 && num <= 64) || (num >= 91 && num <= 96) || (num >= 123 || num <= 126)) {
-        specialCharacter = true;
-      }
-      else if (num >= 65 && num <= 90) {
+      else if (num >= 'A' && num <= 'Z') {
         capital = true;
       }
-    })
-    if (!capital || !number || !specialCharacter) {
+      else if (num >= 'a' && num <= 'z') {
+        regularCharacter = true;
+      }
+      else if ((num >= '!' && num <= '/') || (num >= ':' && num <= '@') || (num >= '[' && num <= '`') || (num >= '{' || num <= '~')) {
+        specialCharacter = true; 
+      } 
+    } 
+    if (capital && number && specialCharacter && regularCharacter) {
       return true;
     }
     return false;
@@ -162,7 +170,13 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
           duration: 3000,
         })
       }
+      
+      // else if: TODO = make sure that account wasnt already created by checking the database
+
+
+
       else {
+        // TODO = add userName and password to database
         toast({
           title: 'Registration Success',
           description: 'Successfullty created an Account',
@@ -171,8 +185,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
           duration: 3000,
         })
       }
-      // perform operations to add this in our database
-      // also make sure that userName is unique, and not found on the database for registration to pass
+    
     }
     catch (err) {
       toast({
@@ -185,6 +198,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
     }
   }
 
+  
   const handleCreate = async () => {
     if (!userName || userName.length === 0) {
       toast({
@@ -253,33 +267,36 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
             <Icon as={LockIcon} w={6} h={6} />
             <FormControl>
               
-              <Input autoFocus name="password" placeholder="Create a Password"
+              <Input type={show ? "text" : "password"} autoFocus name="password" placeholder="Create a Password"
                      value={userPassword}
                      onChange={event => setUserPassword(event.target.value)}/>
+              <InputRightElement width="4.5rem">
+                <Button h="1.75rem" size="sm" onClick={handleShow}>
+                 {show ? "Hide" : "Show"}
+                </Button>
+              </InputRightElement>
             </FormControl>
           </HStack>  
 
           <HStack>
             <Icon as={LockIcon} w={6} h={6} />
             <FormControl>
-              <Input autoFocus name="confirmPassword" placeholder="Confirm Password"
+              <Input type={showConfirmation ? "text" : "password"} autoFocus name="confirmPassword" placeholder="Confirm Password"
                      value={confirmPassword} 
                      onChange={event => setConfirmPassword(event.target.value)}/>
+              <InputRightElement width="4.5rem">
+                <Button h="1.75rem" size="sm" onClick={handleShowConfirmation}>
+                 {showConfirmation ? "Hide" : "Show"}
+                </Button>
+              </InputRightElement>
             </FormControl>
           </HStack>
           <Button data-testid="RegisterButton" onClick={handleRegister}>Register</Button>
         </Stack>
-            
-      </form>
-  </>
-  );
 
-  /*
-  return (
-    <>
-      <form>
 
-        <Stack>
+         
+         <Stack>
           <Box p="4" borderWidth="1px" borderRadius="lg">
             <Heading as="h2" size="lg">Select a username</Heading>
 
@@ -352,9 +369,9 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
           </Box>
           
         </Stack>
+            
       </form>
-    </>
-  ); 
-  */
+  </>
+  );
 }
 
