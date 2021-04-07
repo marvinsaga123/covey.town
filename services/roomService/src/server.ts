@@ -1,10 +1,9 @@
+import CORS from 'cors';
 import Express from 'express';
 import * as http from 'http';
-import CORS from 'cors';
 import { AddressInfo } from 'net';
-import addTownRoutes from './router/towns';
 import CoveyTownsStore from './lib/CoveyTownsStore';
-import { insert } from 'ramda';
+import addTownRoutes from './router/towns';
 
 const app = Express();
 app.use(CORS());
@@ -17,8 +16,7 @@ server.listen(process.env.PORT || 8081, () => {
   // eslint-disable-next-line no-console
   console.log(`Listening on ${address.port}`);
   if (process.env.DEMO_TOWN_ID) {
-    CoveyTownsStore.getInstance()
-      .createTown(process.env.DEMO_TOWN_ID, false);
+    CoveyTownsStore.getInstance().createTown(process.env.DEMO_TOWN_ID, false);
   }
 });
 
@@ -27,21 +25,21 @@ server.listen(process.env.PORT || 8081, () => {
 const { Client } = require('pg');
 
 const client = new Client({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false
-    }
-  });
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
 
 client.connect();
 
-client.query('SELECT * FROM users;', (err: any, res: { rows: any; }) => {
-    if (err) console.log("ERROR!");
+client.query('SELECT * FROM users;', (err: any, res: { rows: any }) => {
+  if (err) console.log('ERROR!');
 
-    for (let row of res.rows) {
-      console.log(JSON.stringify(row));
-    }
-  });
+  for (let row of res.rows) {
+    console.log(JSON.stringify(row));
+  }
+});
 
 // const insertQuery = {
 //   text: 'INSERT INTO users(username, password) VALUES($1, $2)',
