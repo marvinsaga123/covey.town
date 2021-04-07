@@ -4,6 +4,7 @@ import CORS from 'cors';
 import { AddressInfo } from 'net';
 import addTownRoutes from './router/towns';
 import CoveyTownsStore from './lib/CoveyTownsStore';
+import { insert } from 'ramda';
 
 const app = Express();
 app.use(CORS());
@@ -20,3 +21,35 @@ server.listen(process.env.PORT || 8081, () => {
       .createTown(process.env.DEMO_TOWN_ID, false);
   }
 });
+
+// DATABASE EXAMPLES
+
+const { Client } = require('pg');
+
+const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false
+    }
+  });
+
+client.connect();
+
+client.query('SELECT * FROM users;', (err: any, res: { rows: any; }) => {
+    if (err) console.log("ERROR!");
+
+    for (let row of res.rows) {
+      console.log(JSON.stringify(row));
+    }
+  });
+
+// const insertQuery = {
+//   text: 'INSERT INTO users(username, password) VALUES($1, $2)',
+//   values: ['Marvin', 'Marvdog'],
+// }
+
+// // promise
+// client
+//   .query(insertQuery)
+//   .then((res: { rows: any[]; }) => console.log(res.rows))
+//   .catch((e: { stack: any; }) => console.error(e.stack))
