@@ -1,23 +1,134 @@
-import React, { useState } from 'react';
-import PreJoinScreens from '../VideoCall/VideoFrontend/components/PreJoinScreens/PreJoinScreens';
-import MediaErrorSnackbar
-  from '../VideoCall/VideoFrontend/components/PreJoinScreens/MediaErrorSnackbar/MediaErrorSnackbar';
-import { TownJoinResponse } from '../../classes/TownsServiceClient';
+import { LockIcon } from '@chakra-ui/icons';
+import {
+  Button,
+  Center,
+  Flex,
+  FormControl,
+  HStack,
+  Icon,
+  Input,
+  Text,
+  useToast,
+  VStack,
+} from '@chakra-ui/react';
+import React, { useCallback, useState } from 'react';
+import { BiUser } from 'react-icons/bi';
+import { CoveyAppUpdate } from '../../CoveyTypes';
 
-interface LoginProps {
-  doLogin: (initData: TownJoinResponse) => Promise<boolean>
+interface InitialLandingPageProps {
+  dispatchUpdate: (update: CoveyAppUpdate) => void;
 }
 
-export default function Login({ doLogin }: LoginProps): JSX.Element {
-  const [mediaError, setMediaError] = useState<Error>();
+export default function Login({ dispatchUpdate }: InitialLandingPageProps): JSX.Element {
+  const [show, setShow] = useState<boolean>(false);
+  const [userPassword, setUserPassword] = useState<string>();
+  const [userName, setUserName] = useState<string>();
+  const toast = useToast();
+
+  const handleShow = () => setShow(!show);
+
+  const handleLogin = useCallback(async () => {
+    try {
+      if (!userName || userName.length === 0) {
+        toast({
+          title: 'Username is Required',
+          description: 'Please enter your username',
+          status: 'error',
+        });
+
+        return;
+      }
+
+      if (!userPassword || userPassword.length === 0) {
+        toast({
+          title: 'Password is Required',
+          description: 'Please enter your password',
+          status: 'error',
+        });
+
+        return;
+      }
+
+      // TODO: implement login logic here
+    } catch (err) {
+      toast({
+        title: 'Unable to login',
+        description: err.toString(),
+        status: 'error',
+      });
+    }
+  }, [userName, userPassword, toast]);
+
+  const handleRegister = () => {
+    console.log('DISPATCHING UPDATE!');
+
+    dispatchUpdate({
+      action: 'register',
+      data: {
+        isRegistering: true,
+      },
+    });
+  };
 
   return (
-    <>
-      <MediaErrorSnackbar error={mediaError} dismissError={() => setMediaError(undefined)} />
-      <PreJoinScreens
-        doLogin={doLogin}
-        setMediaError={setMediaError}
-      />
-    </>
+    <Flex align='center' justify='center' height='100vh'>
+      <VStack spacing='2.5vh'>
+        <Center height='10vh' width='60vw' borderWidth='1px' centerContent borderColor='#5F2EEA'>
+          <Text as='kbd' fontSize='30px'>
+            Welcome to Covey.Town
+          </Text>
+        </Center>
+
+        <HStack width='60vw'>
+          <Icon as={BiUser} w={6} h={6} />
+          <FormControl>
+            <Input
+              autoFocus
+              name='name'
+              placeholder='Username'
+              value={userName}
+              onChange={event => setUserName(event.target.value)}
+            />
+          </FormControl>
+        </HStack>
+
+        <HStack width='60vw'>
+          <Icon as={LockIcon} w={6} h={6} />
+          <FormControl>
+            <Input
+              type={show ? 'text' : 'password'}
+              autoFocus
+              name='password'
+              placeholder='Password'
+              value={userPassword}
+              onChange={event => setUserPassword(event.target.value)}
+            />
+          </FormControl>
+          <Button onClick={handleShow}>{show ? 'Hide' : 'Show'}</Button>
+        </HStack>
+
+        <Button
+          backgroundColor='#5F2EEA'
+          color='white'
+          as='kbd'
+          width='20vw'
+          data-testid='RegisterButton'
+          onClick={handleLogin}>
+          Login
+        </Button>
+
+        <Button
+          backgroundColor='white'
+          color='#5F2EEA'
+          borderColor='#5F2EEA'
+          borderWidth='1px'
+          as='kbd'
+          width='20vw'
+          data-testid='RegisterButton'
+          onClick={handleRegister}>
+          Register
+        </Button>
+      </VStack>
+    </Flex>
   );
 }
