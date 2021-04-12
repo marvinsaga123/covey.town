@@ -134,6 +134,9 @@ export async function townJoinHandler(
   requestData: TownJoinRequest,
 ): Promise<ResponseEnvelope<TownJoinResponse>> {
   const townsStore = CoveyTownsStore.getInstance();
+  const databaseInstance = CoveyTownDatabase.getInstance();
+
+  console.log('JOIN HANDLER CALLED!');
 
   const coveyTownController = townsStore.getControllerForTown(requestData.coveyTownID);
   if (!coveyTownController) {
@@ -142,9 +145,22 @@ export async function townJoinHandler(
       message: 'Error: No such town',
     };
   }
+
   const newPlayer = new Player(requestData.userName);
   const newSession = await coveyTownController.addPlayer(newPlayer);
   assert(newSession.videoToken);
+
+  console.log(requestData.userName);
+  console.log(coveyTownController.friendlyName);
+
+  const result = await databaseInstance.updateUserCurrentRoom(
+    requestData.userName,
+    coveyTownController.friendlyName,
+  );
+
+  console.log('Result?');
+  console.log(result);
+
   return {
     isOK: true,
     response: {

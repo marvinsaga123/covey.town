@@ -56,6 +56,4 @@ export type CoveyAppUpdate =
   | { action: 'weMoved'; location: UserLocation }
   | { action: 'disconnect' }
   | { action: 'register'; data: { isRegistering: boolean } }
-  | { action: 'loggedIn'; data: { isLoggedIn: boolean } };
-
-export type FriendRequestAction = 'accept' | 'deny';
+  | { action: 'loggedIn'; data: { isLoggedIn: boolean; userName: string } };

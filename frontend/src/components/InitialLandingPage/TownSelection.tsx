@@ -29,13 +29,13 @@ interface TownSelectionProps {
 }
 
 export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Element {
-  const [userName, setUserName] = useState<string>(Video.instance()?.userName || '');
+  const { apiClient, userName: appStateUserName } = useCoveyAppState();
+  const [userName, setUserName] = useState<string>(Video.instance()?.userName || appStateUserName);
   const [newTownName, setNewTownName] = useState<string>('');
   const [newTownIsPublic, setNewTownIsPublic] = useState<boolean>(true);
   const [townIDToJoin, setTownIDToJoin] = useState<string>('');
   const [currentPublicTowns, setCurrentPublicTowns] = useState<CoveyTownInfo[]>();
   const { connect } = useVideoContext();
-  const { apiClient } = useCoveyAppState();
   const toast = useToast();
 
   const updateTownListings = useCallback(() => {

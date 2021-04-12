@@ -59,6 +59,7 @@ export default function Login({ dispatchUpdate }: InitialLoginPageProps): JSX.El
               action: 'loggedIn',
               data: {
                 isLoggedIn: true,
+                userName,
               },
             });
           } else {

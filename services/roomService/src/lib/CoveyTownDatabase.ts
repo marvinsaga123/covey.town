@@ -23,12 +23,11 @@ export default class CoveyTownDatabase {
   }
 
   async processLogin(userName: string, password: string): Promise<boolean> {
-    const text = 'SELECT * FROM users WHERE users.username=$1 and users.password=$2';
-    const values = [userName, password];
+    const query = 'SELECT * FROM users WHERE users.username=$1 and users.password=$2';
+    const queryValues = [userName, password];
 
     try {
-      const res = await this.client.query(text, values);
-      console.log(res.rows[0]);
+      const res = await this.client.query(query, queryValues);
 
       if (res.rows[0] !== undefined) {
         return true;
@@ -93,6 +92,24 @@ export default class CoveyTownDatabase {
 
       return true;
     } catch (err) {
+      return false;
+    }
+  }
+
+  async updateUserCurrentRoom(userName: string, roomName: string): Promise<boolean> {
+    const query = 'UPDATE users SET current_room=$1 WHERE username=$2';
+    const queryValues = [roomName, userName];
+
+    console.log('called!');
+
+    try {
+      const res = await this.client.query(query, queryValues);
+
+      console.log(res);
+
+      return true;
+    } catch (err) {
+      console.log(err);
       return false;
     }
   }
