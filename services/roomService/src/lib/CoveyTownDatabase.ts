@@ -1,4 +1,5 @@
 import { Client } from 'pg';
+import { FriendRequestAction } from '../CoveyTypes';
 
 export default class CoveyTownDatabase {
   private static _instance: CoveyTownDatabase;
@@ -39,9 +40,14 @@ export default class CoveyTownDatabase {
     }
   }
 
-  async processAcceptFriendRequest(sender: string, recipient: string): Promise<boolean> {
-    // const senderId: number;
-    // const recipientId: number;
+  async processFriendRequestAction(
+    action: FriendRequestAction,
+    sender: string,
+    recipient: string,
+  ): Promise<boolean> {
+    let senderId: number;
+    let recipientId: number;
+
     const senderIdQuery = 'SELECT id FROM users WHERE username=$1';
     const senderIdQueryValues = [sender];
 
@@ -54,12 +60,11 @@ export default class CoveyTownDatabase {
       const recipientRes = await this.client.query(recipientIdQuery, recipientIdQueryValues);
 
       if (senderRes.rows[0] === undefined || recipientRes.rows[0] === undefined) {
-        console.log('ERROR!');
         return false;
       }
 
-      const senderId = senderRes.rows[0].id;
-      const recipientId = recipientRes.rows[0].id;
+      senderId = senderRes.rows[0].id;
+      recipientId = recipientRes.rows[0].id;
 
       // delete the friend request related to these users from the friend_requests table
       const friendRequestDeletionQuery =
@@ -68,6 +73,18 @@ export default class CoveyTownDatabase {
 
       await this.client.query(friendRequestDeletionQuery, friendRequestDeletionQueryValues);
 
+      if (action === 'deny') {
+        return true;
+      }
+
+      return await this.processAcceptFriendRequest(senderId, recipientId);
+    } catch (err) {
+      return false;
+    }
+  }
+
+  async processAcceptFriendRequest(senderId: number, recipientId: number): Promise<boolean> {
+    try {
       // insert a new friend row into the friends table
       const friendEntryQuery = 'INSERT INTO friends (sender_id, recipient_id) VALUES ($1, $2)';
       const friendEntryValues = [senderId, recipientId];

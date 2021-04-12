@@ -2,10 +2,14 @@ import assert from 'assert';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ServerPlayer } from './Player';
 
+type FriendRequestAction = 'accept' | 'deny';
+
 /**
- * The format of a request to accept a friend request, as dispatched by server middleware.
+ * The format of a request to accept or deny a friend request, as dispatched by server middleware.
  */
-export interface AcceptFriendRequest {
+export interface FriendRequest {
+  /** is the recipient accepting or denying the friend request? */
+  action: FriendRequestAction;
   /** username of the player who sent the friend request */
   friendRequestSender: string;
   /** username of the player who received and is accepting the friend request */
@@ -165,11 +169,21 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
-  async acceptFriendRequest(requestData: AcceptFriendRequest): Promise<void> {
-    const responseWrapper = await this._axios.post<ResponseEnvelope<void>>(
-      '/acceptFriendRequest',
-      requestData,
-    );
+  async processFriendRequestAction(requestData: FriendRequest): Promise<void> {
+    let responseWrapper: AxiosResponse<ResponseEnvelope<void>>;
+
+    if (requestData.action === 'accept') {
+      responseWrapper = await this._axios.post<ResponseEnvelope<void>>(
+        '/acceptFriendRequest',
+        requestData,
+      );
+    } else {
+      responseWrapper = await this._axios.post<ResponseEnvelope<void>>(
+        '/denyFriendRequest',
+        requestData,
+      );
+    }
+
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 

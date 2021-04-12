@@ -271,7 +271,8 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
         onClick={async () => {
           try {
             await apiClient
-              .acceptFriendRequest({
+              .processFriendRequestAction({
+                action: 'accept',
                 friendRequestSender: 'Testing',
                 friendRequestRecipient: 'Marvin',
               })
@@ -291,6 +292,39 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
           }
         }}>
         Test Accept Friend Request
+      </Button>
+      <Button
+        backgroundColor='white'
+        color='#5F2EEA'
+        borderColor='#5F2EEA'
+        borderWidth='1px'
+        as='kbd'
+        width='20vw'
+        data-testid='RegisterButton'
+        onClick={async () => {
+          try {
+            await apiClient
+              .processFriendRequestAction({
+                action: 'deny',
+                friendRequestSender: 'Marvin',
+                friendRequestRecipient: 'Mike',
+              })
+              .then(res => {
+                console.log('Response!');
+                console.log(res);
+              })
+              .catch(err => {
+                throw err;
+              });
+          } catch (err) {
+            toast({
+              title: 'Accept Request Error!',
+              description: err.toString(),
+              status: 'error',
+            });
+          }
+        }}>
+        Test Deny Friend Request
       </Button>
     </>
   );

@@ -6,10 +6,14 @@ import CoveyTownsStore from '../lib/CoveyTownsStore';
 import CoveyTownListener from '../types/CoveyTownListener';
 import Player from '../types/Player';
 
+type FriendRequestAction = 'deny' | 'accept';
+
 /**
- * The format of a request to accept a friend request, as dispatched by server middleware.
+ * The format of a request to accept or deny a friend request, as dispatched by server middleware.
  */
-export interface AcceptFriendRequest {
+export interface FriendRequest {
+  /** is the recipient accepting or denying the friend request? */
+  action: FriendRequestAction;
   /** username of the player who sent the friend request */
   friendRequestSender: string;
   /** username of the player who received and is accepting the friend request */
@@ -201,11 +205,12 @@ export async function loginHandler(
 }
 
 export async function acceptFriendRequestHandler(
-  requestData: AcceptFriendRequest,
+  requestData: FriendRequest,
 ): Promise<ResponseEnvelope<Record<string, null>>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
 
-  const success = await databaseInstance.processAcceptFriendRequest(
+  const success = await databaseInstance.processFriendRequestAction(
+    requestData.action,
     requestData.friendRequestSender,
     requestData.friendRequestRecipient,
   );
@@ -214,6 +219,24 @@ export async function acceptFriendRequestHandler(
     isOK: success,
     response: {},
     message: !success ? 'Accepting friend request failed, please try again.' : undefined,
+  };
+}
+
+export async function denyFriendRequestHandler(
+  requestData: FriendRequest,
+): Promise<ResponseEnvelope<Record<string, null>>> {
+  const databaseInstance = CoveyTownDatabase.getInstance();
+
+  const success = await databaseInstance.processFriendRequestAction(
+    requestData.action,
+    requestData.friendRequestSender,
+    requestData.friendRequestRecipient,
+  );
+
+  return {
+    isOK: success,
+    response: {},
+    message: !success ? 'Denying friend request failed, please try again.' : undefined,
   };
 }
 
