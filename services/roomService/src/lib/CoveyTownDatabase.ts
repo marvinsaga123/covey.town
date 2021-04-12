@@ -1,4 +1,4 @@
-const { Client } = require('pg');
+import { Client } from 'pg';
 
 export default class CoveyTownDatabase {
   private static _instance: CoveyTownDatabase;
@@ -29,13 +29,12 @@ export default class CoveyTownDatabase {
     try {
       const res = await this.client.query(text, values);
 
-      if (res.rows[0] != undefined) {
+      if (res.rows[0] !== undefined) {
         return true;
-      } else {
-        return false;
       }
+
+      return false;
     } catch (err) {
-      console.log(err.stack);
       return false;
     }
   }
