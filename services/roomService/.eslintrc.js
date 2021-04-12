@@ -9,13 +9,13 @@ module.exports = {
     'plugin:react/recommended',
   ],
   parserOptions: {
-    project: './tsconfig.json',
+    project: './tsconfig.eslint.json',
     tsconfigRootDir: __dirname,
     warnOnUnsupportedTypeScriptVersion: false,
   },
   settings: {
     react: {
-      version: '17.0.1',
+      version: 'latest',
     },
   },
   ignorePatterns: ['/*.*'],
