@@ -16,11 +16,11 @@ import { BiUser } from 'react-icons/bi';
 import { CoveyAppUpdate } from '../../CoveyTypes';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
 
-interface InitialLandingPageProps {
+interface InitialLoginPageProps {
   dispatchUpdate: (update: CoveyAppUpdate) => void;
 }
 
-export default function Login({ dispatchUpdate }: InitialLandingPageProps): JSX.Element {
+export default function Login({ dispatchUpdate }: InitialLoginPageProps): JSX.Element {
   const [show, setShow] = useState<boolean>(false);
   const [userPassword, setUserPassword] = useState<string>();
   const [userName, setUserName] = useState<string>();

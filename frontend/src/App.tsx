@@ -240,7 +240,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
 
   const page = useMemo(() => {
     if (appState.isRegistering) {
-      return <Register />;
+      return <Register dispatchUpdate={dispatchAppUpdate} />;
     }
 
     if (!appState.isLoggedIn) {
