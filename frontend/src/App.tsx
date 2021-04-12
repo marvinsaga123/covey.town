@@ -96,6 +96,9 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
 
   let updatePlayer;
   switch (update.action) {
+    case 'loggedIn':
+      nextState.isLoggedIn = update.data.isLoggedIn;
+      break;
     case 'register':
       nextState.isRegistering = update.data.isRegistering;
       break;

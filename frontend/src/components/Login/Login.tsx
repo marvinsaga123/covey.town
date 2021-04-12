@@ -11,9 +11,10 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import { BiUser } from 'react-icons/bi';
 import { CoveyAppUpdate } from '../../CoveyTypes';
+import useCoveyAppState from '../../hooks/useCoveyAppState';
 
 interface InitialLandingPageProps {
   dispatchUpdate: (update: CoveyAppUpdate) => void;
@@ -24,32 +25,53 @@ export default function Login({ dispatchUpdate }: InitialLandingPageProps): JSX.
   const [userPassword, setUserPassword] = useState<string>();
   const [userName, setUserName] = useState<string>();
   const toast = useToast();
+  const { apiClient } = useCoveyAppState();
 
   const handleShow = () => setShow(!show);
 
-  const handleLogin = useCallback(async () => {
+  const handleLogin = async () => {
+    if (!userName || userName.length === 0) {
+      toast({
+        title: 'Username is Required',
+        description: 'Please enter your username',
+        status: 'error',
+      });
+
+      return;
+    }
+
+    if (!userPassword || userPassword.length === 0) {
+      toast({
+        title: 'Password is Required',
+        description: 'Please enter your password',
+        status: 'error',
+      });
+
+      return;
+    }
+
     try {
-      if (!userName || userName.length === 0) {
-        toast({
-          title: 'Username is Required',
-          description: 'Please enter your username',
-          status: 'error',
+      await apiClient
+        .login({ userName, password: userPassword })
+        .then(res => {
+          if (res.loggedInSuccessfully) {
+            dispatchUpdate({
+              action: 'loggedIn',
+              data: {
+                isLoggedIn: true,
+              },
+            });
+          } else {
+            toast({
+              title: 'Unable to login',
+              description: 'Username and password combination is incorrect. Please try again.',
+              status: 'error',
+            });
+          }
+        })
+        .catch(err => {
+          throw err;
         });
-
-        return;
-      }
-
-      if (!userPassword || userPassword.length === 0) {
-        toast({
-          title: 'Password is Required',
-          description: 'Please enter your password',
-          status: 'error',
-        });
-
-        return;
-      }
-
-      // TODO: implement login logic here
     } catch (err) {
       toast({
         title: 'Unable to login',
@@ -57,11 +79,9 @@ export default function Login({ dispatchUpdate }: InitialLandingPageProps): JSX.
         status: 'error',
       });
     }
-  }, [userName, userPassword, toast]);
+  };
 
   const handleRegister = () => {
-    console.log('DISPATCHING UPDATE!');
-
     dispatchUpdate({
       action: 'register',
       data: {
@@ -113,7 +133,7 @@ export default function Login({ dispatchUpdate }: InitialLandingPageProps): JSX.
           as='kbd'
           width='20vw'
           data-testid='RegisterButton'
-          onClick={handleLogin}>
+          onClick={() => handleLogin()}>
           Login
         </Button>
 
@@ -125,7 +145,7 @@ export default function Login({ dispatchUpdate }: InitialLandingPageProps): JSX.
           as='kbd'
           width='20vw'
           data-testid='RegisterButton'
-          onClick={handleRegister}>
+          onClick={() => handleRegister()}>
           Register
         </Button>
       </VStack>
