@@ -7,6 +7,16 @@ import CoveyTownListener from '../types/CoveyTownListener';
 import Player from '../types/Player';
 
 /**
+ * The format of a request to accept a friend request, as dispatched by server middleware.
+ */
+export interface AcceptFriendRequest {
+  /** username of the player who sent the friend request */
+  friendRequestSender: string;
+  /** username of the player who received and is accepting the friend request */
+  friendRequestRecipient: string;
+}
+
+/**
  * The format of a request to login to Covey.Town, as dispatched by the server middleware
  */
 export interface LoginRequest {
@@ -187,6 +197,23 @@ export async function loginHandler(
     response: {
       loggedInSuccessfully,
     },
+  };
+}
+
+export async function acceptFriendRequestHandler(
+  requestData: AcceptFriendRequest,
+): Promise<ResponseEnvelope<Record<string, null>>> {
+  const databaseInstance = CoveyTownDatabase.getInstance();
+
+  const success = await databaseInstance.processAcceptFriendRequest(
+    requestData.friendRequestSender,
+    requestData.friendRequestRecipient,
+  );
+
+  return {
+    isOK: success,
+    response: {},
+    message: !success ? 'Accepting friend request failed, please try again.' : undefined,
   };
 }
 

@@ -4,6 +4,7 @@ import { Server } from 'http';
 import { StatusCodes } from 'http-status-codes';
 import io from 'socket.io';
 import {
+  acceptFriendRequestHandler,
   loginHandler,
   townCreateHandler,
   townDeleteHandler,
@@ -41,6 +42,24 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
       const result = await loginHandler({
         userName: req.body.userName,
         password: req.body.password,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  /**
+   * Accept a Friend Request
+   */
+  app.post('/acceptFriendRequest', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await acceptFriendRequestHandler({
+        friendRequestSender: req.body.friendRequestSender,
+        friendRequestRecipient: req.body.friendRequestRecipient,
       });
       res.status(StatusCodes.OK).json(result);
     } catch (err) {
