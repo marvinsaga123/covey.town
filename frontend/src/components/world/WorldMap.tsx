@@ -185,13 +185,11 @@ class CoveyGameScene extends Phaser.Scene {
       const isMoving = primaryDirection !== undefined;
       this.player.label.setX(body.x);
       this.player.label.setY(body.y - 20);
-      if (
-        !this.lastLocation ||
-        this.lastLocation.x !== body.x ||
-        this.lastLocation.y !== body.y ||
-        this.lastLocation.rotation !== primaryDirection ||
-        this.lastLocation.moving !== isMoving
-      ) {
+      if (!this.lastLocation
+        || this.lastLocation.x !== body.x
+        || this.lastLocation.y !== body.y
+        || (isMoving && this.lastLocation.rotation !== primaryDirection)
+        || this.lastLocation.moving !== isMoving) {
         if (!this.lastLocation) {
           this.lastLocation = {
             x: body.x,
@@ -429,7 +427,10 @@ class CoveyGameScene extends Phaser.Scene {
 
   resume() {
     this.paused = false;
-    this.input.keyboard.addCapture(this.previouslyCapturedKeys);
+    if(Video.instance()){
+      // If the game is also in process of being torn down, the keyboard could be undefined
+      this.input.keyboard.addCapture(this.previouslyCapturedKeys);
+    }
     this.previouslyCapturedKeys = [];
   }
 }
