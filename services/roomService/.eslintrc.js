@@ -5,14 +5,17 @@ module.exports = {
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'prettier',
+    'plugin:react-hooks/recommended',
+    'plugin:react/recommended',
   ],
   parserOptions: {
-    project: './tsconfig.eslint.json',
+    project: './tsconfig.json',
+    tsconfigRootDir: __dirname,
     warnOnUnsupportedTypeScriptVersion: false,
   },
   settings: {
     react: {
-      version: 'latest',
+      version: '17.0.1',
     },
   },
   ignorePatterns: ['/*.*'],
