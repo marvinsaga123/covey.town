@@ -1,5 +1,8 @@
-import React from 'react';
+import { Button, HStack } from '@chakra-ui/react';
 import { makeStyles, Theme } from '@material-ui/core';
+import React from 'react';
+import { CoveyAppUpdate } from '../../../../../CoveyTypes';
+import useCoveyAppState from '../../../../../hooks/useCoveyAppState';
 
 const useStyles = makeStyles((theme: Theme) => ({
   background: {
@@ -20,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     maxWidth: '700px',
 
     borderRadius: '8px',
-    border: '1px solid #ccc',
+    border: '1px solid #5F2EEA',
     overflow: 'hidden',
     position: 'relative',
   },
@@ -39,21 +42,61 @@ const useStyles = makeStyles((theme: Theme) => ({
 interface IntroContainerProps {
   children: React.ReactNode;
   subContent?: React.ReactNode;
+  dispatchUpdate: (update: CoveyAppUpdate) => void;
 }
 
-const IntroContainer = (props: IntroContainerProps) => {
+const IntroContainer = ({
+  children,
+  subContent,
+  dispatchUpdate,
+}: IntroContainerProps): JSX.Element => {
+  const { userName: appStateUserName } = useCoveyAppState();
   const classes = useStyles();
 
   return (
     <div className={classes.background}>
       <div className={classes.container}>
         <div className={classes.innerContainer}>
-          <div className={classes.content}>{props.children}</div>
+          <HStack
+            borderBottomWidth='1px'
+            borderBottomColor='#5F2EEA'
+            justify='space-between'
+            paddingRight='2em'
+            paddingLeft='2em'
+            paddingTop='0.5em'
+            paddingBottom='0.5em'
+            marginBottom={3}>
+            <p>
+              Logged in as <b>{appStateUserName}</b>
+            </p>
+            <Button
+              backgroundColor='#5F2EEA'
+              color='white'
+              as='kbd'
+              width='10vw'
+              data-testid='RegisterButton'
+              onClick={() => {
+                dispatchUpdate({
+                  action: 'logout',
+                  data: {
+                    isLoggedIn: false,
+                    userName: '',
+                  },
+                });
+              }}>
+              Logout
+            </Button>
+          </HStack>
+          <div className={classes.content}>{children}</div>
         </div>
-        {props.subContent && <div className={classes.subContentContainer}>{props.subContent}</div>}
+        {subContent && <div className={classes.subContentContainer}>{subContent}</div>}
       </div>
     </div>
   );
+};
+
+IntroContainer.defaultProps = {
+  subContent: null,
 };
 
 export default IntroContainer;
