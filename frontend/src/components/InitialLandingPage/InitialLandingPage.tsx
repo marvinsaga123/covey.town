@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
-import PreJoinScreens from '../VideoCall/VideoFrontend/components/PreJoinScreens/PreJoinScreens';
-import MediaErrorSnackbar
-  from '../VideoCall/VideoFrontend/components/PreJoinScreens/MediaErrorSnackbar/MediaErrorSnackbar';
 import { TownJoinResponse } from '../../classes/TownsServiceClient';
+import { CoveyAppUpdate } from '../../CoveyTypes';
+import MediaErrorSnackbar from '../VideoCall/VideoFrontend/components/PreJoinScreens/MediaErrorSnackbar/MediaErrorSnackbar';
+import PreJoinScreens from '../VideoCall/VideoFrontend/components/PreJoinScreens/PreJoinScreens';
 
 interface InitialLandingPageProps {
-  doLogin: (initData: TownJoinResponse) => Promise<boolean>
+  doLogin: (initData: TownJoinResponse) => Promise<boolean>;
+  dispatchUpdate: (update: CoveyAppUpdate) => void;
 }
 
-export default function InitialLandingPage({ doLogin }: InitialLandingPageProps): JSX.Element {
+export default function InitialLandingPage({
+  doLogin,
+  dispatchUpdate,
+}: InitialLandingPageProps): JSX.Element {
   const [mediaError, setMediaError] = useState<Error>();
 
   return (
@@ -17,6 +21,7 @@ export default function InitialLandingPage({ doLogin }: InitialLandingPageProps)
       <PreJoinScreens
         doLogin={doLogin}
         setMediaError={setMediaError}
+        dispatchUpdate={dispatchUpdate}
       />
     </>
   );
