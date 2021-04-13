@@ -2,8 +2,9 @@ import React from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
 import Button from '@material-ui/core/Button';
-import { Typography, Grid, Hidden } from '@material-ui/core';
+import { Typography, Grid, Hidden, Paper, Card } from '@material-ui/core';
 import EndCallButton from '../Buttons/EndCallButton/EndCallButton';
+import LogOutButton from '../Buttons/LogOutButton/LogOutButton';
 import FlipCameraButton from './FlipCameraButton/FlipCameraButton';
 import Menu from './Menu/Menu';
 
@@ -14,6 +15,7 @@ import ToggleVideoButton from '../Buttons/ToggleVideoButton/ToggleVideoButton';
 import ToggleScreenShareButton from '../Buttons/ToogleScreenShareButton/ToggleScreenShareButton';
 import TownSettings from '../../../../Login/TownSettings';
 import MenuContainer from '@material-ui/core/Menu';
+import useCoveyAppState from '../../../../../hooks/useCoveyAppState';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   container: {
@@ -30,6 +32,11 @@ const useStyles = makeStyles((theme: Theme) => createStyles({
       height: `${theme.mobileFooterHeight}px`,
       padding: 0,
     },
+    border: "2px solid #5F2EEA",
+  },
+  item: {
+    borderRight: "2px solid #5F2EEA",
+    borderLeft: "2px solid #5F2EEA"
   },
   screenShareBanner: {
     position: 'absolute',
@@ -67,6 +74,7 @@ export default function MenuBar(props: { setMediaError?(error: Error): void }) {
   const { isSharingScreen, toggleScreenShare } = useVideoContext();
   const roomState = useRoomState();
   const isReconnecting = roomState === 'reconnecting';
+  const {userName} = useCoveyAppState();
 
   return (
     <>
@@ -77,9 +85,10 @@ export default function MenuBar(props: { setMediaError?(error: Error): void }) {
         </Grid>
       )}
       <footer className={classes.container}>
-        <Grid container justify="space-around" alignItems="center">
+        <Grid container justify="space-around" alignItems="center" >
+
           <Grid item>
-            <Grid container justify="center">
+            <Grid container justify="center" >
               <ToggleAudioButton disabled={isReconnecting} setMediaError={props.setMediaError} />
               <ToggleVideoButton disabled={isReconnecting} setMediaError={props.setMediaError} />
               <Hidden smDown>
@@ -89,14 +98,22 @@ export default function MenuBar(props: { setMediaError?(error: Error): void }) {
             </Grid>
           </Grid>
           <Hidden smDown>
-            <Grid style={{ flex: 1 }}>
+
+          <Grid item className={classes.item}>
+            <p>&nbsp;&nbsp; Logged in as <b> [ {userName} ] </b> &nbsp;&nbsp;</p>
+          </Grid>
+
+          <Grid item>
               <Grid container justify="flex-end">
                 <TownSettings />
-
                 <Menu />
+                &nbsp;&nbsp;&nbsp;
                 <EndCallButton />
+                &nbsp;&nbsp;&nbsp;
+                <LogOutButton />
               </Grid>
-            </Grid>
+          </Grid>
+
           </Hidden>
         </Grid>
       </footer>
