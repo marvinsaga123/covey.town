@@ -9,18 +9,18 @@ import { useAppState } from '../../../state';
 
 const useStyles = makeStyles((theme: Theme) => createStyles({
   button: {
-    background: '#C30052',
+    background: '#5F2EEA',
     color: 'white',
     '&:hover': {
-      background: '#600101',
+      background: '#2c1470',
     },
     borderRadius: 40,
     height: 32,
-    width: 140
+    width: 121
   },
 }));
 
-export default function EndCallButton(props: { className?: string }) {
+export default function LogOutButton(props: { className?: string }) {
   const classes = useStyles();
   const { room } = useVideoContext();
 
@@ -34,7 +34,7 @@ export default function EndCallButton(props: { className?: string }) {
       className={clsx(classes.button, props.className)}
       data-cy-disconnect
     >
-      Disconnect
+      Logout
     </Button>
   );
 }
