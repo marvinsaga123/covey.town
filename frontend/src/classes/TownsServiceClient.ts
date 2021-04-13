@@ -1,6 +1,39 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import assert from 'assert';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ServerPlayer } from './Player';
+
+type FriendRequestAction = 'accept' | 'deny';
+
+/**
+ * The format of a request to accept or deny a friend request, as dispatched by server middleware.
+ */
+export interface FriendRequest {
+  /** is the recipient accepting or denying the friend request? */
+  action: FriendRequestAction;
+  /** username of the player who sent the friend request */
+  friendRequestSender: string;
+  /** username of the player who received and is accepting the friend request */
+  friendRequestRecipient: string;
+}
+
+/**
+ * The format of a request to login to Covey.Town, as dispatched by the server middleware
+ */
+export interface LoginRequest {
+  /** userName of the player attempting to login */
+  userName: string;
+  /** password of the player attempting to login */
+  password: string;
+}
+
+/**
+ * The format of a response to login to Covey.Town, as returned by the handler to the server
+ * middleware
+ */
+export interface LoginResponse {
+  /** Does a user exist with the sent userName and passord? */
+  loggedInSuccessfully: boolean;
+}
 
 /**
  * The format of a request to join a Town in Covey.Town, as dispatched by the server middleware
@@ -89,7 +122,7 @@ export type CoveyTownInfo = {
   friendlyName: string;
   coveyTownID: string;
   currentOccupancy: number;
-  maximumOccupancy: number
+  maximumOccupancy: number;
 };
 
 export default class TownsServiceClient {
@@ -106,7 +139,10 @@ export default class TownsServiceClient {
     this._axios = axios.create({ baseURL });
   }
 
-  static unwrapOrThrowError<T>(response: AxiosResponse<ResponseEnvelope<T>>, ignoreResponse = false): T {
+  static unwrapOrThrowError<T>(
+    response: AxiosResponse<ResponseEnvelope<T>>,
+    ignoreResponse = false,
+  ): T {
     if (response.data.isOK) {
       if (ignoreResponse) {
         return {} as T;
@@ -118,17 +154,51 @@ export default class TownsServiceClient {
   }
 
   async createTown(requestData: TownCreateRequest): Promise<TownCreateResponse> {
-    const responseWrapper = await this._axios.post<ResponseEnvelope<TownCreateResponse>>('/towns', requestData);
+    const responseWrapper = await this._axios.post<ResponseEnvelope<TownCreateResponse>>(
+      '/towns',
+      requestData,
+    );
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async login(requestData: LoginRequest): Promise<LoginResponse> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<LoginResponse>>(
+      '/login',
+      requestData,
+    );
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async processFriendRequestAction(requestData: FriendRequest): Promise<void> {
+    let responseWrapper: AxiosResponse<ResponseEnvelope<void>>;
+
+    if (requestData.action === 'accept') {
+      responseWrapper = await this._axios.post<ResponseEnvelope<void>>(
+        '/acceptFriendRequest',
+        requestData,
+      );
+    } else {
+      responseWrapper = await this._axios.post<ResponseEnvelope<void>>(
+        '/denyFriendRequest',
+        requestData,
+      );
+    }
+
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
   async updateTown(requestData: TownUpdateRequest): Promise<void> {
-    const responseWrapper = await this._axios.patch<ResponseEnvelope<void>>(`/towns/${requestData.coveyTownID}`, requestData);
+    const responseWrapper = await this._axios.patch<ResponseEnvelope<void>>(
+      `/towns/${requestData.coveyTownID}`,
+      requestData,
+    );
     return TownsServiceClient.unwrapOrThrowError(responseWrapper, true);
   }
 
   async deleteTown(requestData: TownDeleteRequest): Promise<void> {
-    const responseWrapper = await this._axios.delete<ResponseEnvelope<void>>(`/towns/${requestData.coveyTownID}/${requestData.coveyTownPassword}`);
+    const responseWrapper = await this._axios.delete<ResponseEnvelope<void>>(
+      `/towns/${requestData.coveyTownID}/${requestData.coveyTownPassword}`,
+    );
     return TownsServiceClient.unwrapOrThrowError(responseWrapper, true);
   }
 
@@ -141,5 +211,4 @@ export default class TownsServiceClient {
     const responseWrapper = await this._axios.post('/sessions', requestData);
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
-
 }
