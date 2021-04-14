@@ -28,9 +28,7 @@ To run the backend, you will need a Twilio account. Twilio provides new accounts
 
 In the same `.env` above, add an additional value as follows:
 
-| Config Value            | Description                               |
-| ----------------------- | ----------------------------------------- |
-| `TWILIO_ACCOUNT_SID`    | postgres://epqwpovjlheing:874cd9dd3c88668c08e27cfe3cf6e3ce24bcb7579653deda643afac856ed13e1@ec2-54-205-183-19.compute-1.amazonaws.com:5432/d1evsmn1rjngjr |
+`DATABASE_URL=postgres://epqwpovjlheing:874cd9dd3c88668c08e27cfe3cf6e3ce24bcb7579653deda643afac856ed13e1@ec2-54-205-183-19.compute-1.amazonaws.com:5432/d1evsmn1rjngjr`
 
 ### Starting the backend
 
