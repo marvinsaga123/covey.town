@@ -5,7 +5,9 @@ You can view our reference deployment of the app at [peaceful-brattain-c5eb8c.ne
 
 ## Deploying the App Locally
 
-Running the application locally entails running both the **backend** service and a **frontend**.
+Access and clone the repository here: https://github.com/marvinsaga123/covey.town.
+
+After cloning the repo, running the application locally entails running both the **backend** service and a **frontend**.
 
 ### Backend
 
