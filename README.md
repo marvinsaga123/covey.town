@@ -24,11 +24,11 @@ To run the backend, you will need a Twilio account. Twilio provides new accounts
 | `TWILIO_API_KEY_SECRET` | The secret for the API key you created.   |
 | `TWILIO_API_AUTH_TOKEN` | Visible on your twilio account dashboard. |
 
-#### Setting Up the Database
+#### Setting Up the Database URI
 
 In the same `.env` above, add an additional value as follows:
 
-`DATABASE_URL=postgres://epqwpovjlheing:874cd9dd3c88668c08e27cfe3cf6e3ce24bcb7579653deda643afac856ed13e1@ec2-54-205-183-19.compute-1.amazonaws.com:5432/d1evsmn1rjngjr`
+`DATABASE_URL="postgres://epqwpovjlheing:874cd9dd3c88668c08e27cfe3cf6e3ce24bcb7579653deda643afac856ed13e1@ec2-54-205-183-19.compute-1.amazonaws.com:5432/d1evsmn1rjngjr"`
 
 ### Starting the backend
 
