@@ -30,16 +30,20 @@ In the same `.env` above, add an additional value as follows:
 
 `DATABASE_URL="postgres://epqwpovjlheing:874cd9dd3c88668c08e27cfe3cf6e3ce24bcb7579653deda643afac856ed13e1@ec2-54-205-183-19.compute-1.amazonaws.com:5432/d1evsmn1rjngjr"`
 
-### Starting the backend
+### Frontend
+
+#### Configuring the Frontend
+
+Create a `.env` file in the `frontend` directory, with the line: `REACT_APP_TOWNS_SERVICE_URL=http://localhost:8081`.
+
+## Starting Up the App
+
+### Starting the Backend
 
 Once your backend is configured, you can start it by running `npm start` in the `services/roomService` directory (the first time you run it, you will also need to run `npm install`).
 The backend will automatically restart if you change any of the files in the `services/roomService/src` directory.
 
-### Configuring the frontend
-
-Create a `.env` file in the `frontend` directory, with the line: `REACT_APP_TOWNS_SERVICE_URL=http://localhost:8081` (if you deploy the rooms/towns service to another location, put that location here instead)
-
-### Running the frontend
+### Running the Frontend
 
 In the `frontend` directory, run `npm start` (again, you'll need to run `npm install` the very first time). After several moments (or minutes, depending on the speed of your machine), a browser will open with the frontend running locally.
 The frontend will automatically re-compile and reload in your browser if you change any files in the `frontend/src` directory.
