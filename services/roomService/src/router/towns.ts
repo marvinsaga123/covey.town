@@ -6,8 +6,8 @@ import io from 'socket.io';
 import {
   acceptFriendRequestHandler,
   denyFriendRequestHandler,
-  getPendingFriendRequestsHandler,
   loginHandler,
+  performFriendsListAction,
   townCreateHandler,
   townDeleteHandler,
   townJoinHandler,
@@ -97,7 +97,32 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
    */
   app.get('/pendingFriendRequests/:forUser', BodyParser.json(), async (req, res) => {
     try {
-      const result = await getPendingFriendRequestsHandler({
+      const result = await performFriendsListAction({
+        action: {
+          actionName: 'getPendingFriendRequests',
+          errorMessage: 'Error occurred while getting pending friend requests. Please try again.',
+        },
+        forUser: req.params.forUser,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  /**
+   * Get the friends list for a user
+   */
+  app.get('/listOfFriends/:forUser', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await performFriendsListAction({
+        action: {
+          actionName: 'getCurrentListOfFriends',
+          errorMessage: 'Error occurred while getting current list of friends. Please try again.',
+        },
         forUser: req.params.forUser,
       });
       res.status(StatusCodes.OK).json(result);

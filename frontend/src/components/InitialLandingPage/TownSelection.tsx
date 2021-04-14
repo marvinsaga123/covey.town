@@ -304,6 +304,8 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
           }}>
           Test Deny Friend Request
         </Button>
+      </HStack>
+      <HStack>
         <Button
           backgroundColor='white'
           color='#5F2EEA'
@@ -315,13 +317,14 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
           onClick={async () => {
             try {
               await apiClient
-                .getPendingFriendRequests({
+                .processFriendsListAction({
+                  action: 'getPendingFriendRequests',
                   forUser: userName,
                 })
                 .then(res => {
                   toast({
                     title: 'Pending Friend Requests!',
-                    description: res.pendingRequests.toString(),
+                    description: res.listOfUsers.toString(),
                     status: 'success',
                   });
                 })
@@ -337,6 +340,41 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
             }
           }}>
           Test View Pending Friend Requests
+        </Button>
+        <Button
+          backgroundColor='white'
+          color='#5F2EEA'
+          borderColor='#5F2EEA'
+          borderWidth='1px'
+          as='kbd'
+          data-testid='RegisterButton'
+          fontSize={10}
+          onClick={async () => {
+            try {
+              await apiClient
+                .processFriendsListAction({
+                  action: 'getCurrentListOfFriends',
+                  forUser: userName,
+                })
+                .then(res => {
+                  toast({
+                    title: 'Current Friends!',
+                    description: res.listOfUsers.toString(),
+                    status: 'success',
+                  });
+                })
+                .catch(err => {
+                  throw err;
+                });
+            } catch (err) {
+              toast({
+                title: 'Accept Request Error!',
+                description: err.toString(),
+                status: 'error',
+              });
+            }
+          }}>
+          Test Get Current Friends List
         </Button>
       </HStack>
     </>

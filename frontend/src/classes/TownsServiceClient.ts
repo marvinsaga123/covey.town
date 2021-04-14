@@ -2,25 +2,29 @@ import assert from 'assert';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { ServerPlayer } from './Player';
 
-type FriendRequestAction = 'accept' | 'deny';
+type FriendsListActionName = 'getPendingFriendRequests' | 'getCurrentListOfFriends';
 
 /**
- * The format of a request to get the pending friend requests for a user, as dispatched by server
+ * The format of a request to perform a friends list action on behalf of a user, as dispatched by server
  * middleware
  */
-export interface GetPendingFriendsRequest {
-  /** the user to get the pending friend requests for */
+export interface FriendsListActionRequest {
+  /** the friends list action to perform */
+  action: FriendsListActionName;
+  /** the user to perform the friends list action for */
   forUser: string;
 }
 
 /**
- * The format of a response to get the pending friend requests for a user, as dispatched by
- * the handler to the sever middleware
+ * The format of a response to perform a friends list action on behalf of a user, as dispatched by the
+ * handler to the server middleware
  */
-export interface GetPendingFriendsResponse {
-  /** the list of users who have sent friend requests that are still pending acceptance or denial */
-  pendingRequests: string[];
+export interface FriendsListActionResponse {
+  /** the list of users returned for the friends list action */
+  listOfUsers: string[];
 }
+
+type FriendRequestAction = 'accept' | 'deny';
 
 /**
  * The format of a request to accept or deny a friend request, as dispatched by server middleware
@@ -205,12 +209,21 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
-  async getPendingFriendRequests(
-    requestData: GetPendingFriendsRequest,
-  ): Promise<GetPendingFriendsResponse> {
-    const responseWrapper = await this._axios.get<ResponseEnvelope<GetPendingFriendsResponse>>(
-      `/pendingFriendRequests/${requestData.forUser}`,
-    );
+  async processFriendsListAction(
+    requestData: FriendsListActionRequest,
+  ): Promise<FriendsListActionResponse> {
+    let responseWrapper: AxiosResponse<ResponseEnvelope<FriendsListActionResponse>>;
+
+    if (requestData.action === 'getCurrentListOfFriends') {
+      responseWrapper = await this._axios.get<ResponseEnvelope<FriendsListActionResponse>>(
+        `/listOfFriends/${requestData.forUser}`,
+      );
+    } else {
+      responseWrapper = await this._axios.get<ResponseEnvelope<FriendsListActionResponse>>(
+        `/pendingFriendRequests/${requestData.forUser}`,
+      );
+    }
+
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 

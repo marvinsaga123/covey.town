@@ -1,27 +1,29 @@
 import assert from 'assert';
 import { Socket } from 'socket.io';
-import { CoveyTownList, UserLocation } from '../CoveyTypes';
+import { CoveyTownList, FriendsListAction, UserLocation } from '../CoveyTypes';
 import CoveyTownDatabase from '../lib/CoveyTownDatabase';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
 import CoveyTownListener from '../types/CoveyTownListener';
 import Player from '../types/Player';
 
 /**
- * The format of a request to get the pending friend requests for a user, as dispatched by server
+ * The format of a request to perform a friends list action on behalf of a user, as dispatched by server
  * middleware
  */
-export interface GetPendingFriendsRequest {
-  /** the user to get the pending friend requests for */
+export interface FriendsListActionRequest {
+  /** the friends list action to perform */
+  action: FriendsListAction;
+  /** the user to perform the friends list action for */
   forUser: string;
 }
 
 /**
- * The format of a response to get the pending friend requests for a user, as dispatched by
- * the handler to the sever middleware
+ * The format of a response to perform a friends list action on behalf of a user, as dispatched by the
+ * handler to the server middleware
  */
-export interface GetPendingFriendsResponse {
-  /** the list of users who have sent friend requests that are still pending acceptance or denial */
-  pendingRequests: string[];
+export interface FriendsListActionResponse {
+  /** the list of users returned for the friends list action */
+  listOfUsers: string[];
 }
 
 type FriendRequestAction = 'deny' | 'accept';
@@ -258,25 +260,26 @@ export async function denyFriendRequestHandler(
   };
 }
 
-export async function getPendingFriendRequestsHandler(
-  requestData: GetPendingFriendsRequest,
-): Promise<ResponseEnvelope<GetPendingFriendsResponse>> {
+export async function performFriendsListAction(
+  requestData: FriendsListActionRequest,
+): Promise<ResponseEnvelope<FriendsListActionResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
 
-  const pendingFriendRequestsDatabaseResponse = await databaseInstance.getPendingFriendRequests(
+  const friendsListResponseObject = await databaseInstance.processFriendsListAction(
+    requestData.action.actionName,
     requestData.forUser,
   );
 
-  if (!pendingFriendRequestsDatabaseResponse.success) {
+  if (!friendsListResponseObject.success) {
     return {
       isOK: false,
-      message: 'An error occurred getting pending friend requests, please try again.',
+      message: requestData.action.errorMessage,
     };
   }
 
   return {
     isOK: true,
-    response: { pendingRequests: pendingFriendRequestsDatabaseResponse.pendingRequests },
+    response: { listOfUsers: friendsListResponseObject.response },
   };
 }
 

@@ -1,10 +1,5 @@
 import { Client } from 'pg';
-import { FriendRequestAction } from '../CoveyTypes';
-
-interface PendingFriendRequestsDatabaseResponse {
-  success: boolean;
-  pendingRequests: string[];
-}
+import { FriendRequestAction, FriendsListActionName, FriendsListResponse } from '../CoveyTypes';
 
 export default class CoveyTownDatabase {
   private static _instance: CoveyTownDatabase;
@@ -101,7 +96,10 @@ export default class CoveyTownDatabase {
     }
   }
 
-  async getPendingFriendRequests(forUser: string): Promise<PendingFriendRequestsDatabaseResponse> {
+  async processFriendsListAction(
+    action: FriendsListActionName,
+    forUser: string,
+  ): Promise<FriendsListResponse> {
     let forUserId: number;
     let query = 'SELECT id FROM users WHERE username=$1';
     let values: string[] | number[] | [number[]] = [forUser];
@@ -116,46 +114,46 @@ export default class CoveyTownDatabase {
 
       forUserId = userIdRes.rows[0].id;
 
-      // get the ids of users who have sent pending friend requests to the user id above
-      query = 'SELECT * FROM friend_requests WHERE recipient_id=$1';
+      // query the appropriate table to get a list of user IDs
+      const tableToQuery = action === 'getPendingFriendRequests' ? 'friend_requests' : 'friends';
+
+      query = `SELECT * FROM ${tableToQuery} WHERE recipient_id=$1`;
       values = [forUserId];
 
-      const pendingRequestsRes = await this.client.query(query, values);
+      let queryRes = await this.client.query(query, values);
 
-      // indicates this user has no pending friend requests
-      if (pendingRequestsRes.rows.length === 0) {
+      if (queryRes.rows.length === 0) {
         return {
           success: true,
-          pendingRequests: [],
+          response: [],
         };
       }
 
-      const senderIds = pendingRequestsRes.rows.map(row => row.sender_id);
+      const listOfIds = queryRes.rows.map(row => row.sender_id);
 
-      // get and return the names of the users who have sent pending friend requests
+      // get the list of names for the list of ids above
       query = 'SELECT * FROM users WHERE id = ANY($1)';
-      values = [senderIds];
+      values = [listOfIds];
 
-      const pendingRequestsNamesRes = await this.client.query(query, values);
+      queryRes = await this.client.query(query, values);
 
-      // indicates a consistency issue between the friend_requests and users table
-      if (pendingRequestsNamesRes.rows.length !== senderIds.length) {
+      if (queryRes.rows.length !== listOfIds.length) {
         return {
-          success: true,
-          pendingRequests: [],
+          success: false,
+          response: [],
         };
       }
 
-      const senderUsernames = pendingRequestsNamesRes.rows.map(row => row.username);
+      const listOfUsernames = queryRes.rows.map(row => row.username);
 
       return {
         success: true,
-        pendingRequests: senderUsernames,
+        response: listOfUsernames,
       };
     } catch (err) {
       return {
         success: false,
-        pendingRequests: [],
+        response: [],
       };
     }
   }
