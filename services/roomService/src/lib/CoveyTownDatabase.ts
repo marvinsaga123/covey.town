@@ -28,7 +28,6 @@ export default class CoveyTownDatabase {
 
     try {
       const res = await this.client.query(text, values);
-      console.log(res.rows[0]);
 
       if (res.rows[0] !== undefined) {
         return true;
