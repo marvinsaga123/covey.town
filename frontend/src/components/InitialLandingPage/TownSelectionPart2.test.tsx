@@ -94,7 +94,7 @@ function wrappedTownSelection() {
           currentTownIsPubliclyListed: false,
           currentTownFriendlyName: '',
           sessionToken: '',
-          userName: '',
+          userName: 'Test',
           socket: null,
           currentLocation: {
             x: 0,
@@ -116,7 +116,6 @@ function wrappedTownSelection() {
 describe('Town Selection - depends on Part 1 passing', () => {
   let renderData: RenderResult<typeof import('@testing-library/dom/types/queries')>;
   let townIDToJoinField: HTMLInputElement;
-  let userNameField: HTMLInputElement;
   let joinTownByIDButton: TargetElement;
   let expectedTowns: TownListResponse;
 
@@ -137,22 +136,17 @@ describe('Town Selection - depends on Part 1 passing', () => {
     townIDToJoinField = renderData.getByPlaceholderText(
       'ID of town to join, or select from list',
     ) as HTMLInputElement;
-    userNameField = renderData.getByPlaceholderText('Your name') as HTMLInputElement;
     joinTownByIDButton = renderData.getByTestId('joinTownByIDButton');
   });
   describe('Part 2 - Joining existing towns', () => {
     describe('Joining an existing town by ID', () => {
       const joinTownWithOptions = async (params: { coveyTownID: string; userName: string }) => {
-        fireEvent.change(userNameField, { target: { value: params.userName } });
-        await waitFor(() => {
-          expect(userNameField.value).toBe(params.userName);
-        });
         fireEvent.change(townIDToJoinField, { target: { value: params.coveyTownID } });
         await waitFor(() => expect(townIDToJoinField.value).toBe(params.coveyTownID));
         userEvent.click(joinTownByIDButton);
       };
 
-      it('includes a connect button, which calls Video.setup, doLogin, and connect with the entered username and coveyTownID (public town)', async () => {
+      it('includes a connect button, which calls Video.setup, doLogin, and connect with the coveyTownID (public town)', async () => {
         const coveyTownID = nanoid();
         const userName = nanoid();
 
@@ -169,23 +163,9 @@ describe('Town Selection - depends on Part 1 passing', () => {
         });
 
         // Check for call sequence
-        await waitFor(() => expect(mockVideoSetup).toBeCalledWith(userName, coveyTownID));
+        await waitFor(() => expect(mockVideoSetup).toBeCalledWith('Test', coveyTownID));
         await waitFor(() => expect(doLoginMock).toBeCalledWith({ providerVideoToken: videoToken }));
         await waitFor(() => expect(mockConnect).toBeCalledWith(videoToken));
-      });
-      it('displays an error toast "Unable to join town" if the username is empty', async () => {
-        const coveyTownID = nanoid();
-        await joinTownWithOptions({
-          coveyTownID,
-          userName: '',
-        });
-        await waitFor(() =>
-          expect(mockToast).toBeCalledWith({
-            description: 'Please select a username',
-            title: 'Unable to join town',
-            status: 'error',
-          }),
-        );
       });
       it('displays an error toast "Unable to join town" if the TownID is empty', async () => {
         const userName = nanoid();
@@ -222,7 +202,7 @@ describe('Town Selection - depends on Part 1 passing', () => {
         });
 
         // Check for call sequence
-        await waitFor(() => expect(mockVideoSetup).toBeCalledWith(userName, coveyTownID));
+        await waitFor(() => expect(mockVideoSetup).toBeCalledWith('Test', coveyTownID));
         await waitFor(() =>
           expect(doLoginMock).not.toBeCalledWith({ providerVideoToken: videoToken }),
         );
@@ -250,7 +230,7 @@ describe('Town Selection - depends on Part 1 passing', () => {
         });
 
         // Check for call sequence
-        await waitFor(() => expect(mockVideoSetup).toBeCalledWith(userName, coveyTownID));
+        await waitFor(() => expect(mockVideoSetup).toBeCalledWith('Test', coveyTownID));
         await waitFor(() => expect(doLoginMock).toBeCalledWith({ providerVideoToken: videoToken }));
         await waitFor(() => expect(mockConnect).not.toBeCalledWith(videoToken));
         await waitFor(() =>
@@ -277,7 +257,7 @@ describe('Town Selection - depends on Part 1 passing', () => {
         });
 
         // Check for call sequence
-        await waitFor(() => expect(mockVideoSetup).toBeCalledWith(userName, coveyTownID));
+        await waitFor(() => expect(mockVideoSetup).toBeCalledWith('Test', coveyTownID));
         await waitFor(() => expect(doLoginMock).toBeCalledWith({ providerVideoToken: videoToken }));
         await waitFor(() => expect(mockConnect).toBeCalledWith(videoToken));
         await waitFor(() =>
@@ -302,15 +282,8 @@ describe('Town Selection - depends on Part 1 passing', () => {
             const row = rows.find(each => within(each).queryByText(town.coveyTownID));
             if (row) {
               const button = within(row).getByRole('button');
-              const username = nanoid();
-              fireEvent.change(userNameField, { target: { value: username } });
-              await waitFor(() => {
-                expect(userNameField.value).toBe(username);
-              });
               userEvent.click(button);
-              await waitFor(() =>
-                expect(mockVideoSetup).toBeCalledWith(username, town.coveyTownID),
-              );
+              await waitFor(() => expect(mockVideoSetup).toBeCalledWith('Test', town.coveyTownID));
               await waitFor(() =>
                 expect(doLoginMock).toBeCalledWith({ providerVideoToken: videoToken }),
               );
@@ -329,40 +302,8 @@ describe('Town Selection - depends on Part 1 passing', () => {
             const row = rows.find(each => within(each).queryByText(town.coveyTownID));
             if (row) {
               const button = within(row).getByRole('button');
-              const username = nanoid();
-              fireEvent.change(userNameField, { target: { value: username } });
-              await waitFor(() => {
-                expect(userNameField.value).toBe(username);
-              });
               userEvent.click(button);
               await waitFor(() => expect(mockVideoSetup).not.toBeCalled());
-            } else {
-              fail(`Could not find row for town ${town.coveyTownID}`);
-            }
-          }
-        }
-      });
-      it('displays an error toast "Unable to join town" if the username is empty', async () => {
-        const rows = renderData.getAllByRole('row');
-        for (const town of expectedTowns.towns) {
-          if (town.currentOccupancy < town.maximumOccupancy) {
-            mockVideoSetup.mockReset();
-            const row = rows.find(each => within(each).queryByText(town.coveyTownID));
-            if (row) {
-              const button = within(row).getByRole('button');
-              fireEvent.change(userNameField, { target: { value: '' } });
-              await waitFor(() => {
-                expect(userNameField.value).toBe('');
-              });
-              userEvent.click(button);
-              await waitFor(() => expect(mockVideoSetup).not.toBeCalled());
-              await waitFor(() =>
-                expect(mockToast).toBeCalledWith({
-                  title: 'Unable to join town',
-                  description: 'Please select a username',
-                  status: 'error',
-                }),
-              );
             } else {
               fail(`Could not find row for town ${town.coveyTownID}`);
             }
@@ -382,10 +323,6 @@ describe('Town Selection - depends on Part 1 passing', () => {
             if (row) {
               const button = within(row).getByRole('button');
               const username = nanoid();
-              fireEvent.change(userNameField, { target: { value: username } });
-              await waitFor(() => {
-                expect(userNameField.value).toBe(username);
-              });
               userEvent.click(button);
               await waitFor(() => expect(mockVideoSetup).toBeCalled());
               await waitFor(() =>
@@ -404,14 +341,8 @@ describe('Town Selection - depends on Part 1 passing', () => {
               doLoginMock.mockReset();
               doLoginMock.mockRejectedValue(new Error(errorMessage));
 
-              fireEvent.change(userNameField, { target: { value: username } });
-              await waitFor(() => {
-                expect(userNameField.value).toBe(username);
-              });
               userEvent.click(button);
-              await waitFor(() =>
-                expect(mockVideoSetup).toBeCalledWith(username, town.coveyTownID),
-              );
+              await waitFor(() => expect(mockVideoSetup).toBeCalledWith('Test', town.coveyTownID));
               await waitFor(() =>
                 expect(doLoginMock).toBeCalledWith({ providerVideoToken: videoToken }),
               );
@@ -431,14 +362,8 @@ describe('Town Selection - depends on Part 1 passing', () => {
               doLoginMock.mockReturnValue(Promise.resolve(true));
               mockConnect.mockRejectedValue(new Error(errorMessage));
 
-              fireEvent.change(userNameField, { target: { value: username } });
-              await waitFor(() => {
-                expect(userNameField.value).toBe(username);
-              });
               userEvent.click(button);
-              await waitFor(() =>
-                expect(mockVideoSetup).toBeCalledWith(username, town.coveyTownID),
-              );
+              await waitFor(() => expect(mockVideoSetup).toBeCalledWith('Test', town.coveyTownID));
               await waitFor(() =>
                 expect(doLoginMock).toBeCalledWith({ providerVideoToken: videoToken }),
               );

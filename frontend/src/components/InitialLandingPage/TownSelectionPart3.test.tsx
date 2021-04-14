@@ -94,7 +94,7 @@ function wrappedTownSelection() {
           currentTownIsPubliclyListed: false,
           currentTownFriendlyName: '',
           sessionToken: '',
-          userName: '',
+          userName: 'Test',
           socket: null,
           currentLocation: {
             x: 0,
@@ -117,7 +117,6 @@ describe('Town Selection - depends on Part 1 passing', () => {
   let renderData: RenderResult<typeof import('@testing-library/dom/types/queries')>;
   let newTownNameField: HTMLInputElement;
   let newTownIsPublicCheckbox: HTMLInputElement;
-  let userNameField: HTMLInputElement;
   let newTownButton: TargetElement;
 
   beforeEach(async () => {
@@ -135,23 +134,17 @@ describe('Town Selection - depends on Part 1 passing', () => {
     await waitFor(() => expect(renderData.getByText(`town1${suffix}`)).toBeInTheDocument());
     newTownIsPublicCheckbox = renderData.getByLabelText('Publicly Listed') as HTMLInputElement;
     newTownNameField = renderData.getByPlaceholderText('New Town Name') as HTMLInputElement;
-    userNameField = renderData.getByPlaceholderText('Your name') as HTMLInputElement;
     newTownButton = renderData.getByTestId('newTownButton');
   });
 
   describe('Part 3 - Creating a new town', () => {
     const createTownWithOptions = async (params: {
       townName: string;
-      userName: string;
       togglePublicBox?: boolean;
       townID?: string;
       roomPassword?: string;
       errorMessage?: string;
     }) => {
-      fireEvent.change(userNameField, { target: { value: params.userName } });
-      await waitFor(() => {
-        expect(userNameField.value).toBe(params.userName);
-      });
       fireEvent.change(newTownNameField, { target: { value: params.townName } });
       await waitFor(() => expect(newTownNameField.value).toBe(params.townName));
       if (params.togglePublicBox) {
@@ -173,24 +166,9 @@ describe('Town Selection - depends on Part 1 passing', () => {
     };
     describe('when clicking create', () => {
       describe('with invalid values', () => {
-        it('displays an error toast "Unable to create town" if the username is empty', async () => {
-          await createTownWithOptions({
-            userName: '',
-            townName: nanoid(),
-            errorMessage: 'FAIL',
-          });
-          await waitFor(() =>
-            expect(mockToast).toBeCalledWith({
-              title: 'Unable to create town',
-              description: 'Please select a username before creating a town',
-              status: 'error',
-            }),
-          );
-        });
         it('displays an error toast "Unable to create town" if the newTownName is empty', async () => {
           await createTownWithOptions({
             townName: '',
-            userName: nanoid(),
             errorMessage: 'FAIL',
           });
           await waitFor(() =>
@@ -209,7 +187,6 @@ describe('Town Selection - depends on Part 1 passing', () => {
           const townName = nanoid();
           await createTownWithOptions({
             townName,
-            userName: nanoid(),
             townID,
             roomPassword,
           });
@@ -227,7 +204,6 @@ describe('Town Selection - depends on Part 1 passing', () => {
           const townName = nanoid();
           await createTownWithOptions({
             townName,
-            userName: nanoid(),
             townID,
             roomPassword,
             togglePublicBox: true,
@@ -246,7 +222,6 @@ describe('Town Selection - depends on Part 1 passing', () => {
           const townName = nanoid();
           await createTownWithOptions({
             townName,
-            userName: nanoid(),
             townID,
             roomPassword,
             togglePublicBox: true,
@@ -271,7 +246,6 @@ describe('Town Selection - depends on Part 1 passing', () => {
         it('after success, calls Video.setup, doLogin, and connect with the entered username and newly generated coveyTownID', async () => {
           const townID = nanoid();
           const roomPassword = nanoid();
-          const userName = nanoid();
           const townName = nanoid();
 
           // Configure mocks
@@ -284,14 +258,13 @@ describe('Town Selection - depends on Part 1 passing', () => {
           // Create town
           await createTownWithOptions({
             townName,
-            userName,
             townID,
             roomPassword,
             togglePublicBox: true,
           });
 
           // Check for call sequence
-          await waitFor(() => expect(mockVideoSetup).toBeCalledWith(userName, townID));
+          await waitFor(() => expect(mockVideoSetup).toBeCalledWith('Test', townID));
           await waitFor(() =>
             expect(doLoginMock).toBeCalledWith({ providerVideoToken: videoToken }),
           );
@@ -302,7 +275,6 @@ describe('Town Selection - depends on Part 1 passing', () => {
           const townName = nanoid();
           await createTownWithOptions({
             townName,
-            userName: nanoid(),
             errorMessage,
           });
           await waitFor(() =>
