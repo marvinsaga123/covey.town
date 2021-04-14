@@ -3,16 +3,15 @@
 Covey.Town provides a virtual meeting space where different groups of people can have simultaneous video calls, allowing participants to drift between different conversations, just like in real life. This version was built on top of the Covey.Town repo built for Northeastern's [Spring 2021 software engineering course](https://neu-se.github.io/CS4530-CS5500-Spring-2021/).
 You can view our reference deployment of the app at [peaceful-brattain-c5eb8c.netlify.app](https://peaceful-brattain-c5eb8c.netlify.app/).
 
-A backend service (in the `services/roomService` directory) implements the application logic: tracking which "towns" are available to be joined, and the state of each of those towns.
+## Deploying the App Locally
 
-## Running this app locally
+Running the application locally entails running both the **backend** service and a **frontend**.
 
-Running the application locally entails running both the backend service and a frontend.
+### Backend
 
-### Setting up the backend
+#### Setting Up the Backend
 
-To run the backend, you will need a Twilio account. Twilio provides new accounts with $15 of credit, which is more than enough to get started.
-To create an account and configure your local environment:
+To run the backend, you will need a Twilio account. Twilio provides new accounts with $15 of credit, which is more than enough to get started. To create an account and configure your local environment:
 
 1. Go to [Twilio](https://www.twilio.com/) and create an account. You do not need to provide a credit card to create a trial account.
 2. Create an API key and secret (select "API Keys" on the left under "Settings")
