@@ -6,6 +6,7 @@ import io from 'socket.io';
 import {
   acceptFriendRequestHandler,
   denyFriendRequestHandler,
+  getPendingFriendRequestsHandler,
   loginHandler,
   townCreateHandler,
   townDeleteHandler,
@@ -81,6 +82,23 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
         action: req.body.action,
         friendRequestSender: req.body.friendRequestSender,
         friendRequestRecipient: req.body.friendRequestRecipient,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  /**
+   * Get the pending friend requests for a user
+   */
+  app.get('/pendingFriendRequests/:forUser', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await getPendingFriendRequestsHandler({
+        forUser: req.params.forUser,
       });
       res.status(StatusCodes.OK).json(result);
     } catch (err) {
