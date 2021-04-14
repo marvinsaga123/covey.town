@@ -160,7 +160,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       break;
     case 'disconnect':
       state.socket?.disconnect();
-      return defaultAppState();
+      return { ...defaultAppState(), isLoggedIn: true };
     default:
       throw new Error('Unexpected state request');
   }
@@ -265,7 +265,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
     return (
       <div>
         <WorldMap />
-        <VideoOverlay preferredMode='fullwidth' />
+        <VideoOverlay preferredMode='fullwidth' dispatchUpdate={dispatchAppUpdate} />
       </div>
     );
   }, [

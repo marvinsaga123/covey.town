@@ -2,6 +2,7 @@ import { Grid, Hidden, Typography } from '@material-ui/core';
 import Button from '@material-ui/core/Button';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import React from 'react';
+import { CoveyAppUpdate } from '../../../../../CoveyTypes';
 import useCoveyAppState from '../../../../../hooks/useCoveyAppState';
 import TownSettings from '../../../../InitialLandingPage/TownSettings';
 import useRoomState from '../../hooks/useRoomState/useRoomState';
@@ -16,6 +17,7 @@ import Menu from './Menu/Menu';
 
 interface MenuBarProps {
   setMediaError?(error: Error): void;
+  dispatchUpdate: (update: CoveyAppUpdate) => void;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -72,7 +74,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function MenuBar({ setMediaError }: MenuBarProps): JSX.Element {
+export default function MenuBar({ setMediaError, dispatchUpdate }: MenuBarProps): JSX.Element {
   const classes = useStyles();
   const { isSharingScreen, toggleScreenShare } = useVideoContext();
   const roomState = useRoomState();
@@ -113,7 +115,7 @@ export default function MenuBar({ setMediaError }: MenuBarProps): JSX.Element {
                 &nbsp;&nbsp;&nbsp;
                 <EndCallButton />
                 &nbsp;&nbsp;&nbsp;
-                <LogOutButton />
+                <LogOutButton dispatchUpdate={dispatchUpdate} />
               </Grid>
             </Grid>
           </Hidden>
