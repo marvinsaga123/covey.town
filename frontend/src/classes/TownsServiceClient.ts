@@ -5,7 +5,25 @@ import { ServerPlayer } from './Player';
 type FriendRequestAction = 'accept' | 'deny';
 
 /**
- * The format of a request to accept or deny a friend request, as dispatched by server middleware.
+ * The format of a request to get the pending friend requests for a user, as dispatched by server
+ * middleware
+ */
+export interface GetPendingFriendsRequest {
+  /** the user to get the pending friend requests for */
+  forUser: string;
+}
+
+/**
+ * The format of a response to get the pending friend requests for a user, as dispatched by
+ * the handler to the sever middleware
+ */
+export interface GetPendingFriendsResponse {
+  /** the list of users who have sent friend requests that are still pending acceptance or denial */
+  pendingRequests: string[];
+}
+
+/**
+ * The format of a request to accept or deny a friend request, as dispatched by server middleware
  */
 export interface FriendRequest {
   /** is the recipient accepting or denying the friend request? */
@@ -184,6 +202,15 @@ export default class TownsServiceClient {
       );
     }
 
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async getPendingFriendRequests(
+    requestData: GetPendingFriendsRequest,
+  ): Promise<GetPendingFriendsResponse> {
+    const responseWrapper = await this._axios.get<ResponseEnvelope<GetPendingFriendsResponse>>(
+      `/pendingFriendRequests/${requestData.forUser}`,
+    );
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 

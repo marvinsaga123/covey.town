@@ -6,6 +6,24 @@ import CoveyTownsStore from '../lib/CoveyTownsStore';
 import CoveyTownListener from '../types/CoveyTownListener';
 import Player from '../types/Player';
 
+/**
+ * The format of a request to get the pending friend requests for a user, as dispatched by server
+ * middleware
+ */
+export interface GetPendingFriendsRequest {
+  /** the user to get the pending friend requests for */
+  forUser: string;
+}
+
+/**
+ * The format of a response to get the pending friend requests for a user, as dispatched by
+ * the handler to the sever middleware
+ */
+export interface GetPendingFriendsResponse {
+  /** the list of users who have sent friend requests that are still pending acceptance or denial */
+  pendingRequests: string[];
+}
+
 type FriendRequestAction = 'deny' | 'accept';
 
 /**
@@ -237,6 +255,28 @@ export async function denyFriendRequestHandler(
     isOK: success,
     response: {},
     message: !success ? 'Denying friend request failed, please try again.' : undefined,
+  };
+}
+
+export async function getPendingFriendRequestsHandler(
+  requestData: GetPendingFriendsRequest,
+): Promise<ResponseEnvelope<GetPendingFriendsResponse>> {
+  const databaseInstance = CoveyTownDatabase.getInstance();
+
+  const pendingFriendRequestsDatabaseResponse = await databaseInstance.getPendingFriendRequests(
+    requestData.forUser,
+  );
+
+  if (!pendingFriendRequestsDatabaseResponse.success) {
+    return {
+      isOK: false,
+      message: 'An error occurred getting pending friend requests, please try again.',
+    };
+  }
+
+  return {
+    isOK: true,
+    response: { pendingRequests: pendingFriendRequestsDatabaseResponse.pendingRequests },
   };
 }
 

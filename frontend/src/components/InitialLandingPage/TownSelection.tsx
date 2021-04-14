@@ -6,6 +6,7 @@ import {
   FormControl,
   FormLabel,
   Heading,
+  HStack,
   Input,
   Stack,
   Table,
@@ -236,72 +237,108 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
           </Box>
         </Stack>
       </form>
-      <Button
-        backgroundColor='white'
-        color='#5F2EEA'
-        borderColor='#5F2EEA'
-        borderWidth='1px'
-        as='kbd'
-        width='20vw'
-        data-testid='RegisterButton'
-        onClick={async () => {
-          try {
-            await apiClient
-              .processFriendRequestAction({
-                action: 'accept',
-                friendRequestSender: 'Testing',
-                friendRequestRecipient: 'Marvin',
-              })
-              .then(res => {
-                console.log('Response!');
-                console.log(res);
-              })
-              .catch(err => {
-                throw err;
+      <HStack>
+        <Button
+          backgroundColor='white'
+          color='#5F2EEA'
+          borderColor='#5F2EEA'
+          borderWidth='1px'
+          as='kbd'
+          data-testid='RegisterButton'
+          fontSize={10}
+          onClick={async () => {
+            try {
+              await apiClient
+                .processFriendRequestAction({
+                  action: 'accept',
+                  friendRequestSender: 'Testing',
+                  friendRequestRecipient: 'Marvin',
+                })
+                .then(res => {
+                  console.log('Response!');
+                  console.log(res);
+                })
+                .catch(err => {
+                  throw err;
+                });
+            } catch (err) {
+              toast({
+                title: 'Accept Request Error!',
+                description: err.toString(),
+                status: 'error',
               });
-          } catch (err) {
-            toast({
-              title: 'Accept Request Error!',
-              description: err.toString(),
-              status: 'error',
-            });
-          }
-        }}>
-        Test Accept Friend Request
-      </Button>
-      <Button
-        backgroundColor='white'
-        color='#5F2EEA'
-        borderColor='#5F2EEA'
-        borderWidth='1px'
-        as='kbd'
-        width='20vw'
-        data-testid='RegisterButton'
-        onClick={async () => {
-          try {
-            await apiClient
-              .processFriendRequestAction({
-                action: 'deny',
-                friendRequestSender: 'Marvin',
-                friendRequestRecipient: 'Mike',
-              })
-              .then(res => {
-                console.log('Response!');
-                console.log(res);
-              })
-              .catch(err => {
-                throw err;
+            }
+          }}>
+          Test Accept Friend Request
+        </Button>
+        <Button
+          backgroundColor='white'
+          color='#5F2EEA'
+          borderColor='#5F2EEA'
+          borderWidth='1px'
+          as='kbd'
+          fontSize={10}
+          data-testid='RegisterButton'
+          onClick={async () => {
+            try {
+              await apiClient
+                .processFriendRequestAction({
+                  action: 'deny',
+                  friendRequestSender: 'Marvin',
+                  friendRequestRecipient: 'Mike',
+                })
+                .then(res => {
+                  console.log('Response!');
+                  console.log(res);
+                })
+                .catch(err => {
+                  throw err;
+                });
+            } catch (err) {
+              toast({
+                title: 'Accept Request Error!',
+                description: err.toString(),
+                status: 'error',
               });
-          } catch (err) {
-            toast({
-              title: 'Accept Request Error!',
-              description: err.toString(),
-              status: 'error',
-            });
-          }
-        }}>
-        Test Deny Friend Request
-      </Button>
+            }
+          }}>
+          Test Deny Friend Request
+        </Button>
+        <Button
+          backgroundColor='white'
+          color='#5F2EEA'
+          borderColor='#5F2EEA'
+          borderWidth='1px'
+          as='kbd'
+          data-testid='RegisterButton'
+          fontSize={10}
+          onClick={async () => {
+            try {
+              await apiClient
+                .getPendingFriendRequests({
+                  forUser: userName,
+                })
+                .then(res => {
+                  toast({
+                    title: 'Pending Friend Requests!',
+                    description: res.pendingRequests.toString(),
+                    status: 'success',
+                  });
+                })
+                .catch(err => {
+                  throw err;
+                });
+            } catch (err) {
+              toast({
+                title: 'Accept Request Error!',
+                description: err.toString(),
+                status: 'error',
+              });
+            }
+          }}>
+          Test View Pending Friend Requests
+        </Button>
+      </HStack>
     </>
   );
 }

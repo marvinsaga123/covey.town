@@ -1,6 +1,11 @@
 import { Client } from 'pg';
 import { FriendRequestAction } from '../CoveyTypes';
 
+interface PendingFriendRequestsDatabaseResponse {
+  success: boolean;
+  pendingRequests: string[];
+}
+
 export default class CoveyTownDatabase {
   private static _instance: CoveyTownDatabase;
 
@@ -93,6 +98,65 @@ export default class CoveyTownDatabase {
       return true;
     } catch (err) {
       return false;
+    }
+  }
+
+  async getPendingFriendRequests(forUser: string): Promise<PendingFriendRequestsDatabaseResponse> {
+    let forUserId: number;
+    let query = 'SELECT id FROM users WHERE username=$1';
+    let values: string[] | number[] | [number[]] = [forUser];
+
+    try {
+      // get the user id for the passed in username
+      const userIdRes = await this.client.query(query, values);
+
+      if (userIdRes.rows[0] === undefined) {
+        throw Error();
+      }
+
+      forUserId = userIdRes.rows[0].id;
+
+      // get the ids of users who have sent pending friend requests to the user id above
+      query = 'SELECT * FROM friend_requests WHERE recipient_id=$1';
+      values = [forUserId];
+
+      const pendingRequestsRes = await this.client.query(query, values);
+
+      // indicates this user has no pending friend requests
+      if (pendingRequestsRes.rows.length === 0) {
+        return {
+          success: true,
+          pendingRequests: [],
+        };
+      }
+
+      const senderIds = pendingRequestsRes.rows.map(row => row.sender_id);
+
+      // get and return the names of the users who have sent pending friend requests
+      query = 'SELECT * FROM users WHERE id = ANY($1)';
+      values = [senderIds];
+
+      const pendingRequestsNamesRes = await this.client.query(query, values);
+
+      // indicates a consistency issue between the friend_requests and users table
+      if (pendingRequestsNamesRes.rows.length !== senderIds.length) {
+        return {
+          success: true,
+          pendingRequests: [],
+        };
+      }
+
+      const senderUsernames = pendingRequestsNamesRes.rows.map(row => row.username);
+
+      return {
+        success: true,
+        pendingRequests: senderUsernames,
+      };
+    } catch (err) {
+      return {
+        success: false,
+        pendingRequests: [],
+      };
     }
   }
 }
