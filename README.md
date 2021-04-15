@@ -7,43 +7,13 @@ You can view our reference deployment of the app at [peaceful-brattain-c5eb8c.ne
 
 Access and clone the repository here: https://github.com/marvinsaga123/covey.town.
 
-After cloning the repo, running the application locally entails running both the **backend** service and a **frontend**.
+After cloning the repo, running the application locally entails running only running the **frontend** service (you'll be accessing the backend deployed at Heroku).
 
-### Backend
+### Configuring the Frontend
 
-#### Setting Up the Backend
-
-To run the backend, you will need a Twilio account. Twilio provides new accounts with $15 of credit, which is more than enough to get started. To create an account and configure your local environment:
-
-1. Go to [Twilio](https://www.twilio.com/) and create an account. You do not need to provide a credit card to create a trial account.
-2. Create an API key and secret (select "API Keys" on the left under "Settings")
-3. Create a `.env` file in the `services/roomService` directory, setting the values as follows:
-
-| Config Value            | Description                               |
-| ----------------------- | ----------------------------------------- |
-| `TWILIO_ACCOUNT_SID`    | Visible on your twilio account dashboard. |
-| `TWILIO_API_KEY_SID`    | The SID of the new API key you created.   |
-| `TWILIO_API_KEY_SECRET` | The secret for the API key you created.   |
-| `TWILIO_API_AUTH_TOKEN` | Visible on your twilio account dashboard. |
-
-#### Setting Up the Database URI
-
-In the same `.env` above, add an additional value as follows:
-
-`DATABASE_URL="postgres://epqwpovjlheing:874cd9dd3c88668c08e27cfe3cf6e3ce24bcb7579653deda643afac856ed13e1@ec2-54-205-183-19.compute-1.amazonaws.com:5432/d1evsmn1rjngjr"`
-
-### Frontend
-
-#### Configuring the Frontend
-
-Create a `.env` file in the `frontend` directory, with the line: `REACT_APP_TOWNS_SERVICE_URL=http://localhost:8081`.
+Create a `.env` file in the `frontend` directory, with the line: `REACT_APP_TOWNS_SERVICE_URL=https://covey-town-final-project.herokuapp.com/`. This will ensure that the frontend running locally will be able to communicate with the rooms / town service deployed to Heroku.
 
 ## Starting Up the App
-
-### Starting the Backend
-
-Once your backend is configured, you can start it by running `npm start` in the `services/roomService` directory (the first time you run it, you will also need to run `npm install`).
-The backend will automatically restart if you change any of the files in the `services/roomService/src` directory.
 
 ### Running the Frontend
 
