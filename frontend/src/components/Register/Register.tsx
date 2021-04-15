@@ -14,6 +14,8 @@ import {
 import React, { useState } from 'react';
 import { BiUser } from 'react-icons/bi';
 import { CoveyAppUpdate } from '../../CoveyTypes';
+import useCoveyAppState from '../../hooks/useCoveyAppState';
+
 
 interface InitialRegisterPageProps {
   dispatchUpdate: (update: CoveyAppUpdate) => void;
@@ -28,6 +30,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
   const [userId, setUserID] = useState<string>();
   const [userPassword, setUserPassword] = useState<string>();
   const [confirmPassword, setConfirmPassword] = useState<string>();
+  const { apiClient } = useCoveyAppState();
 
   const passwordIsValid = async () => {
     if (!userPassword || userPassword.length < 8) {
@@ -94,10 +97,29 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
           duration: 3000,
         });
       }
-
-      // else if: TODO = make sure that account wasnt already created by checking the database
       else {
-        // TODO = add userName and password to database
+        await apiClient
+        .register({ userName: userId , password: userPassword })
+        .then(res => {
+          if (res.registerSuccessfully) {
+            /** dispatchUpdate({
+              action: 'register',
+              data: {
+                isRegistering: true,
+              },
+            }); */
+            console.log('Register Success');
+          } else {
+            toast({
+              title: 'Unable to Register',
+              description: 'Account was same user name was already created!.',
+              status: 'error',
+            });
+          }
+        })
+        .catch(err => {
+          throw err;
+        }); 
         toast({
           title: 'Registration Success',
           description: 'Successfullty created an Account',
