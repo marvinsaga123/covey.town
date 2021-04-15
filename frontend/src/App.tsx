@@ -108,6 +108,9 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     case 'register':
       nextState.isRegistering = update.data.isRegistering;
       break;
+    case 'finishRegistration':
+      nextState.isRegistering = update.data.isRegistering;
+      break;
     case 'doConnect':
       nextState.sessionToken = update.data.sessionToken;
       nextState.myPlayerID = update.data.myPlayerID;

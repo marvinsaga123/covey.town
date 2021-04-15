@@ -11,9 +11,12 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
+import { ErrorTwoTone } from '@material-ui/icons';
 import React, { useState } from 'react';
 import { BiUser } from 'react-icons/bi';
 import { CoveyAppUpdate } from '../../CoveyTypes';
+import useCoveyAppState from '../../hooks/useCoveyAppState';
+
 
 interface InitialRegisterPageProps {
   dispatchUpdate: (update: CoveyAppUpdate) => void;
@@ -28,14 +31,14 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
   const [userId, setUserID] = useState<string>();
   const [userPassword, setUserPassword] = useState<string>();
   const [confirmPassword, setConfirmPassword] = useState<string>();
+  const { apiClient } = useCoveyAppState();
 
   const passwordIsValid = async () => {
     if (!userPassword || userPassword.length < 8) {
       return false;
     }
     let capital = false;
-    let number = false;
-    let regularCharacter = false;
+    let number = false; 
     let specialCharacter = false;
     for (let index = 0; index < userPassword.length; index += 1) {
       const num = userPassword.charAt(index);
@@ -43,8 +46,6 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
         number = true;
       } else if (num >= 'A' && num <= 'Z') {
         capital = true;
-      } else if (num >= 'a' && num <= 'z') {
-        regularCharacter = true;
       } else if (
         (num >= '!' && num <= '/') ||
         (num >= ':' && num <= '@') ||
@@ -55,7 +56,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
         specialCharacter = true;
       }
     }
-    if (capital && number && specialCharacter && regularCharacter) {
+    if (capital && number && specialCharacter) {
       return true;
     }
     return false;
@@ -94,22 +95,41 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
           duration: 3000,
         });
       }
-
-      // else if: TODO = make sure that account wasnt already created by checking the database
       else {
-        // TODO = add userName and password to database
-        toast({
-          title: 'Registration Success',
-          description: 'Successfullty created an Account',
-          status: 'success',
-          isClosable: true,
-          duration: 3000,
-        });
+        await apiClient
+        .register({ userName: userId , password: userPassword })
+        .then(res => {
+          if (res.registerSuccessfully) {
+            toast({
+              title: 'Registration Success',
+              description: 'Successfullty created an Account',
+              status: 'success',
+              isClosable: true,
+              duration: 3000,
+            });
+            dispatchUpdate({
+              action: 'finishRegistration',
+              data: {
+                isRegistering: false,
+              },
+            }); 
+            console.log('Register Success');
+          } else {
+            toast({
+              title: 'Unable to Register',
+              description: 'Account was same user name was already created!',
+              status: 'error',
+            });
+          }
+        })
+        .catch(err => {
+          throw err;
+        }); 
       }
     } catch (err) {
       toast({
         title: 'Error: ',
-        description: err,
+        description: err.toString(),
         status: 'error',
         isClosable: true,
         duration: 3000,

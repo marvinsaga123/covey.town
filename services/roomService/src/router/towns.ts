@@ -7,6 +7,7 @@ import {
   acceptFriendRequestHandler,
   denyFriendRequestHandler,
   loginHandler,
+  registerHandler,
   performFriendsListAction,
   townCreateHandler,
   townDeleteHandler,
@@ -42,6 +43,24 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
   app.post('/login', BodyParser.json(), async (req, res) => {
     try {
       const result = await loginHandler({
+        userName: req.body.userName,
+        password: req.body.password,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  /**
+   * Register an Account to Covey.Town
+   */
+  app.post('/register', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await registerHandler({
         userName: req.body.userName,
         password: req.body.password,
       });

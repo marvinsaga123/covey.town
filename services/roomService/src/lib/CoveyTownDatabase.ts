@@ -39,6 +39,25 @@ export default class CoveyTownDatabase {
     }
   }
 
+  async processRegister(userName: string, password: string): Promise<boolean> {
+    try {
+      const lookUpUser = 'SELECT * FROM users WHERE username=$1';
+      const lookUpUserValues = [userName];
+      const res = await this.client.query(lookUpUser, lookUpUserValues);
+
+      if (res.rows.length === 0) {
+        const registerUser = 'INSERT INTO users (username,password) VALUES($1,$2)';
+        const registerUserValues = [userName, password];
+        await this.client.query(registerUser, registerUserValues);
+        return true;
+      }
+
+      return false;
+    } catch (err) {
+      return false;
+    }
+  }
+
   async processFriendRequestAction(
     action: FriendRequestAction,
     sender: string,
