@@ -43,12 +43,12 @@ export default class CoveyTownDatabase {
     try {
       const lookUpUser = 'SELECT * FROM users WHERE username=$1';
       const lookUpUserValues = [userName];
-      const res = await this.client.query(lookUpUser,lookUpUserValues);
+      const res = await this.client.query(lookUpUser, lookUpUserValues);
 
       if (res.rows.length === 0) {
         const registerUser = 'INSERT INTO users (username,password) VALUES($1,$2)';
-        const registerUserValues = [userName,password];
-        await this.client.query(registerUser,registerUserValues);
+        const registerUserValues = [userName, password];
+        await this.client.query(registerUser, registerUserValues);
         return true;
       }
 
