@@ -161,7 +161,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       break;
     case 'disconnect':
       state.socket?.disconnect();
-      return { ...defaultAppState(), isLoggedIn: true };
+      return { ...defaultAppState(), isLoggedIn: true, userName: state.userName };
     default:
       throw new Error('Unexpected state request');
   }

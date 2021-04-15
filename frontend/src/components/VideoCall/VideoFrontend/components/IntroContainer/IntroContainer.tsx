@@ -74,7 +74,7 @@ const IntroContainer = ({
               color='white'
               as='kbd'
               width='10vw'
-              data-testid='RegisterButton'
+              data-testid='LogoutButton'
               onClick={() => {
                 dispatchUpdate({
                   action: 'logout',
