@@ -11,6 +11,7 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
+import { ErrorTwoTone } from '@material-ui/icons';
 import React, { useState } from 'react';
 import { BiUser } from 'react-icons/bi';
 import { CoveyAppUpdate } from '../../CoveyTypes';
@@ -37,8 +38,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
       return false;
     }
     let capital = false;
-    let number = false;
-    let regularCharacter = false;
+    let number = false; 
     let specialCharacter = false;
     for (let index = 0; index < userPassword.length; index += 1) {
       const num = userPassword.charAt(index);
@@ -46,8 +46,6 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
         number = true;
       } else if (num >= 'A' && num <= 'Z') {
         capital = true;
-      } else if (num >= 'a' && num <= 'z') {
-        regularCharacter = true;
       } else if (
         (num >= '!' && num <= '/') ||
         (num >= ':' && num <= '@') ||
@@ -58,7 +56,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
         specialCharacter = true;
       }
     }
-    if (capital && number && specialCharacter && regularCharacter) {
+    if (capital && number && specialCharacter) {
       return true;
     }
     return false;
@@ -102,17 +100,24 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
         .register({ userName: userId , password: userPassword })
         .then(res => {
           if (res.registerSuccessfully) {
-            /** dispatchUpdate({
-              action: 'register',
+            toast({
+              title: 'Registration Success',
+              description: 'Successfullty created an Account',
+              status: 'success',
+              isClosable: true,
+              duration: 3000,
+            });
+            dispatchUpdate({
+              action: 'finishRegistration',
               data: {
-                isRegistering: true,
+                isRegistering: false,
               },
-            }); */
+            }); 
             console.log('Register Success');
           } else {
             toast({
               title: 'Unable to Register',
-              description: 'Account was same user name was already created!.',
+              description: 'Account was same user name was already created!',
               status: 'error',
             });
           }
@@ -120,18 +125,11 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
         .catch(err => {
           throw err;
         }); 
-        toast({
-          title: 'Registration Success',
-          description: 'Successfullty created an Account',
-          status: 'success',
-          isClosable: true,
-          duration: 3000,
-        });
       }
     } catch (err) {
       toast({
         title: 'Error: ',
-        description: err,
+        description: err.toString(),
         status: 'error',
         isClosable: true,
         duration: 3000,
