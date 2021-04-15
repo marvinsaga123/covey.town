@@ -17,5 +17,4 @@ Create a `.env` file in the `frontend` directory, with the line: `REACT_APP_TOWN
 
 ### Running the Frontend
 
-In the `frontend` directory, run `npm start` (again, you'll need to run `npm install` the very first time). After several moments (or minutes, depending on the speed of your machine), a browser will open with the frontend running locally.
-The frontend will automatically re-compile and reload in your browser if you change any files in the `frontend/src` directory.
+In the `frontend` directory, run `npm start` (again, you'll need to run `npm install` the very first time). After several moments (or minutes, depending on the speed of your machine), a browser will open with the frontend running locally. The frontend will automatically re-compile and reload in your browser if you change any files in the `frontend/src` directory. You should now be able to register, login, and interact with the new features implemented as part of this iteration of Covey.Town.
