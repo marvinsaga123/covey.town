@@ -55,7 +55,7 @@ The previous implementation of the `RoomsService` from the original repository w
 
 [ WIP ] - Rachel
 
-## Live Deployement
+## Live Deployment
 
 ### Frontend 
 
