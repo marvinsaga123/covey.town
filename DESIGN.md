@@ -36,8 +36,7 @@ The previous implementation of the `RoomsService` from the original repository w
 
 - Registering an account in Covey.Town
 - Logging in to Covey.Town
-- Logging out of Covey.Town
-- Manage friend requests
+- Search by users by username
 
 ### `FriendsService`
 
@@ -45,7 +44,7 @@ The previous implementation of the `RoomsService` from the original repository w
 
 #### New Features Handled by `FriendsService`
 
-- Search by users by username
+- Manage friend requests
 - View one's current friends list
 - View the rooms friends are currently in if the Covey.Town room is public
 
