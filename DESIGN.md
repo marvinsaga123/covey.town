@@ -1,4 +1,4 @@
-# Covey.Town CS4530 Final Project DESIGN.md
+# Covey.Town CS4530 Final Project DESIGN Overview
 
 ## High Level Architecture
 
