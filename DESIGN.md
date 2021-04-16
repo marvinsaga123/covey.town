@@ -43,18 +43,17 @@ The previous implementation of the `RoomsService` from the original repository w
 - View one's current friends list
 - View the rooms friends are currently in if the Covey.Town room is public
 
-## Fronted Updates
+## Frontend Updates
 
 In addition to app state and backend services additions, a number of Frontend updates were performed as well. The Frontend updates performed as part of this final project include:
 
 - Login and registration user interface implementations
 - Initial landing page (town selection) was updated to match the new purple color scheme
 - All text inputs integrate the purple color scheme when focused
-- Username and logout button are noew rendered at the top of the town selection page
+- Username and a selection of buttons to log out or interact with the friends list and other users are now rendered at the top of the town selection page
 - A list showing the current users in the video chat is rendered on the right side of the world map page
 - The menu bar at the bottom of the world map page was updated to match the new purple color scheme
-- This menu bar also now displays the currently logged in user's username
-- This menu bar also displays a logout button and a revamped disconnect button
+- This menu bar also now displays the currently logged in user's username, a logout button, and a revamped disconnect button
 
 ## Database
 
