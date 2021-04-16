@@ -9,7 +9,6 @@ export default function CurrentVideoChatUsersList(): JSX.Element {
     <Box
       flex={1}
       centerContent
-      marginRight='0.5em'
       height='50vh'
       overflowY='scroll'
       borderBottomWidth='1px'

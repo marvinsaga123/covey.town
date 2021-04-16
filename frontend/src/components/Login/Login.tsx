@@ -25,7 +25,7 @@ export default function Login({ dispatchUpdate }: InitialLoginPageProps): JSX.El
   const [userPassword, setUserPassword] = useState<string>();
   const [userName, setUserName] = useState<string>();
   const toast = useToast();
-  const { apiClient } = useCoveyAppState();
+  const { userClient } = useCoveyAppState();
 
   const handleShow = () => setShow(!show);
 
@@ -51,7 +51,7 @@ export default function Login({ dispatchUpdate }: InitialLoginPageProps): JSX.El
     }
 
     try {
-      await apiClient
+      await userClient
         .login({ userName, password: userPassword })
         .then(res => {
           if (res.loggedInSuccessfully) {

@@ -31,9 +31,14 @@ export type Friend = {
   requestRecipient: string;
 };
 
-export type FriendsListResponse = {
+export type FriendsListDatabaseResponse = {
   success: boolean;
   response: Friend[];
+};
+
+export type RegisterDatabaseResponse = {
+  success: boolean;
+  errorMessage?: string;
 };
 
 export type Friendship = {
@@ -45,7 +50,7 @@ export type SearchResponse = {
   success: boolean;
   /** Does a user exist that matches the given username? */
   listOfUsers: Friendship[];
-}
+};
 
 export interface SendFriendRequestAction {
   /** userName to be searched for */

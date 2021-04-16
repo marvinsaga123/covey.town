@@ -104,7 +104,7 @@ export default function MenuBar({ setMediaError, dispatchUpdate }: MenuBarProps)
           <Hidden smDown>
             <Grid item className={classes.item}>
               <p>
-                &nbsp;&nbsp; Logged in as <b> [ {userName} ] </b> &nbsp;&nbsp;
+                &nbsp;&nbsp; Logged in as <b>{userName}</b> &nbsp;&nbsp;
               </p>
             </Grid>
 

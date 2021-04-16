@@ -6,25 +6,17 @@ import io from 'socket.io';
 import {
   acceptFriendRequestHandler,
   denyFriendRequestHandler,
-  loginHandler,
-  performFriendsListAction,
-  performUserSearchAction,
   performAddFriendAction,
-  townCreateHandler,
-  townDeleteHandler,
-  townJoinHandler,
-  townListHandler,
-  townSubscriptionHandler,
-  townUpdateHandler,
+  performCancelFriendRequest,
   performFriendRemovalAction,
-  performCancelFriendRequest
+  performFriendsListAction,
+  townSubscriptionHandler,
 } from '../requestHandlers/CoveyTownRequestHandlers';
 import { logError } from '../Utils';
 
 export default function addFriendsRoutes(http: Server, app: Express): io.Server {
-
   /**
-   * Accept a Friend Request
+   * Accept a friend request
    */
   app.post('/acceptFriendRequest', BodyParser.json(), async (req, res) => {
     try {
@@ -43,7 +35,7 @@ export default function addFriendsRoutes(http: Server, app: Express): io.Server 
   });
 
   /**
-   * Deny a Friend Request
+   * Deny a friend request
    */
   app.post('/denyFriendRequest', BodyParser.json(), async (req, res) => {
     try {
@@ -61,14 +53,14 @@ export default function addFriendsRoutes(http: Server, app: Express): io.Server 
     }
   });
 
-    /**
-   * Remove a Friend
+  /**
+   * Remove a friend from a user's friend list
    */
   app.post('/removeFriend', BodyParser.json(), async (req, res) => {
     try {
       const result = await performFriendRemovalAction({
         friend: req.body.friend,
-        user: req.body.user
+        user: req.body.user,
       });
       res.status(StatusCodes.OK).json(result);
     } catch (err) {
@@ -79,21 +71,25 @@ export default function addFriendsRoutes(http: Server, app: Express): io.Server 
     }
   });
 
+  /**
+   * Cancel a friend request
+   */
   app.post('/cancelFriendRequest', BodyParser.json(), async (req, res) => {
     try {
       const result = await performCancelFriendRequest({
-          action: 'cancel',
-          friendRequestSender: req.body.friendRequestSender,
-          friendRequestRecipient: req.body.friendRequestRecipient,
-        });
-        res.status(StatusCodes.OK).json(result);
-      } catch (err) {
-        logError(err);
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-          message: 'Internal server error, please see log in server for more details',
-        });
-      }
-    });
+        action: 'cancel',
+        friendRequestSender: req.body.friendRequestSender,
+        friendRequestRecipient: req.body.friendRequestRecipient,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
   /**
    * Get the pending friend requests for a user
    */
@@ -129,19 +125,20 @@ export default function addFriendsRoutes(http: Server, app: Express): io.Server 
       });
       res.status(StatusCodes.OK).json(result);
     } catch (err) {
-      console.log(err);
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         message: 'Internal server error, please see log in server for more details',
       });
     }
   });
 
+  /**
+   * Accept a friend request
+   */
   app.post('/addFriend', BodyParser.json(), async (req, res) => {
     try {
-
       const result = await performAddFriendAction({
         sender: req.body.sender,
-        recipient: req.body.recipient
+        recipient: req.body.recipient,
       });
 
       res.status(StatusCodes.OK).json(result);

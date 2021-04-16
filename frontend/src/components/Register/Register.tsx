@@ -29,7 +29,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
   const [userId, setUserID] = useState<string>();
   const [userPassword, setUserPassword] = useState<string>();
   const [confirmPassword, setConfirmPassword] = useState<string>();
-  const { apiClient } = useCoveyAppState();
+  const { userClient } = useCoveyAppState();
 
   const passwordIsValid = async () => {
     if (!userPassword || userPassword.length < 8) {
@@ -94,7 +94,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
           duration: 3000,
         });
       } else {
-        await apiClient
+        await userClient
           .register({ userName: userId, password: userPassword })
           .then(res => {
             if (res.registerSuccessfully) {

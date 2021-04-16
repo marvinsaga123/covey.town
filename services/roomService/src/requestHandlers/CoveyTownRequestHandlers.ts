@@ -1,31 +1,23 @@
 import assert from 'assert';
 import { Socket } from 'socket.io';
-import { CoveyTownList, Friend, Friendship, FriendsListAction, UserLocation } from '../CoveyTypes';
+import { CoveyTownList, FriendsListAction, UserLocation } from '../CoveyTypes';
 import CoveyTownDatabase from '../lib/CoveyTownDatabase';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
 import CoveyTownListener from '../types/CoveyTownListener';
 import Player from '../types/Player';
 
-/**
- * The format of a request to register to Covey.Town, as dispatched by the server middleware
- */
-export interface RegisterRequest {
-  /** userName of the player attempting to login */
-  userName: string;
-  /** password of the player attempting to login */
-  password: string;
-}
+type Friendship = {
+  username: string;
+  friendship: boolean;
+};
 
-/**
- * The format of a response to login to Covey.Town, as returned by the handler to the server
- * middleware
- */
-export interface RegisterResponse {
-  /** Does a user exist with the sent userName and passord? */
-  registerSuccessfully: boolean;
-  /** Error message if register was not successful */
-  errorMessage?: string;
-}
+type Friend = {
+  username: string;
+  online: boolean;
+  room: string;
+  requestSender: string;
+  requestRecipient: string;
+};
 
 /**
  * The format of a request to perform a friends list action on behalf of a user, as dispatched by server
@@ -47,7 +39,7 @@ export interface FriendsListActionResponse {
   listOfUsers: Friend[];
 }
 /**
- * The format of a request to accept or deny a friend request, as dispatched by server middleware.
+ * The format of a request to accept or deny a friend request, as dispatched by server middleware
  */
 export interface FriendRequest {
   /** is the recipient accepting or denying the friend request? */
@@ -56,6 +48,83 @@ export interface FriendRequest {
   friendRequestSender: string;
   /** username of the player who received and is accepting the friend request */
   friendRequestRecipient: string;
+}
+
+/**
+ * The format of a request to send a friend request, as dispatched by sever middleware
+ */
+export interface AddFriendRequest {
+  /** userName to be searched for */
+  recipient: string;
+  sender: string;
+}
+
+/**
+ * The format of a response to send a friend request, as dispatched by the handler to the server
+ * middleware
+ */
+export interface AddFriendResponse {
+  /** Does a user exist that matches the given username? */
+  requestSentSuccess: boolean;
+}
+
+/**
+ * The format of a request to cancel a friend request, as dispatched by sever middleware
+ */
+export interface RemoveFriendRequest {
+  /** userName to be searched for */
+  friend: string;
+  user: string;
+}
+
+/**
+ * The format of a response to cancel a friend reques or remove a current friend, as dispatched by the
+ * handler to the server middleware
+ */
+export interface RemoveFriendResponse {
+  /** Does a user exist that matches the given username? */
+  requestSentSuccess: boolean;
+}
+
+/**
+ * The format of a request to search for an existing user in Covey.Town, as dispatched by the server
+ * middleware
+ */
+export interface SearchUsersRequest {
+  /** userName to be searched for */
+  userName: string;
+  /** Current user performing the search */
+  currUser: string;
+}
+
+/**
+ * The format of a response to search for an existing user in Covey.Town, as returned by the handler to
+ * the server middleware
+ */
+export interface SearchUsersResponse {
+  /** Does a user exist that matches the given username? */
+  listOfUsers: Friendship[];
+}
+
+/**
+ * The format of a request to register an account in Covey.town, as dispatched by the server middleware
+ */
+export interface RegisterRequest {
+  /** userName of the player attempting to login */
+  userName: string;
+  /** password of the player attempting to login */
+  password: string;
+}
+
+/**
+ * The format of a response to login to Covey.Town, as returned by the handler to the server
+ * middleware
+ */
+export interface RegisterResponse {
+  /** Does a user exist with the sent userName and passord? */
+  registerSuccessfully: boolean;
+  /** Error message if register was not successful */
+  errorMessage?: string;
 }
 
 /**
@@ -69,45 +138,12 @@ export interface LoginRequest {
 }
 
 /**
- * THe format of a response to login to Covey.Town, as returned by the handler to the server
+ * The format of a response to login to Covey.Town, as returned by the handler to the server
  * middleware
  */
 export interface LoginResponse {
   /** Does a user exist with the sent userName and passord? */
   loggedInSuccessfully: boolean;
-}
-
-export interface SearchUsersRequest {
-  /** userName to be searched for */
-  userName: string;
-  currUser: string;
-}
-
-export interface SearchUsersResponse {
-  /** Does a user exist that matches the given username? */
-  listOfUsers: Friendship[];
-}
-
-export interface AddFriendRequest {
-  /** userName to be searched for */
-  recipient: string;
-  sender: string;
-}
-
-export interface AddFriendResponse {
-  /** Does a user exist that matches the given username? */
-  requestSentSuccess: boolean;
-}
-
-export interface RemoveFriendRequest {
-/** userName to be searched for */
-friend: string;
-user: string;
-}
-
-export interface RemoveFriendResponse {
-/** Does a user exist that matches the given username? */
-requestSentSuccess: boolean;
 }
 
 /**
@@ -288,7 +324,7 @@ export async function acceptFriendRequestHandler(
 
   return {
     isOK: success,
-    response: {requestSentSuccess: success},
+    response: { requestSentSuccess: success },
     message: !success ? 'Accepting friend request failed, please try again.' : undefined,
   };
 }
@@ -306,7 +342,7 @@ export async function denyFriendRequestHandler(
 
   return {
     isOK: success,
-    response: {requestSentSuccess: success},
+    response: { requestSentSuccess: success },
     message: !success ? 'Denying friend request failed, please try again.' : undefined,
   };
 }
@@ -366,15 +402,15 @@ export async function performUserSearchAction(
   requestData: SearchUsersRequest,
 ): Promise<ResponseEnvelope<SearchUsersResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
-    console.log("in towns")
 
   const userListResponseObject = await databaseInstance.searchUsers(
-    requestData.userName, requestData.currUser
+    requestData.userName,
+    requestData.currUser,
   );
 
   return {
     isOK: userListResponseObject.success,
-    response: { listOfUsers: userListResponseObject.listOfUsers }
+    response: { listOfUsers: userListResponseObject.listOfUsers },
   };
 }
 
@@ -384,12 +420,13 @@ export async function performAddFriendAction(
   const databaseInstance = CoveyTownDatabase.getInstance();
 
   const addFriendResponseObject = await databaseInstance.sendFriendRequest(
-    requestData.sender, requestData.recipient
+    requestData.sender,
+    requestData.recipient,
   );
 
   return {
     isOK: addFriendResponseObject,
-    response: {requestSentSuccess: addFriendResponseObject}
+    response: { requestSentSuccess: addFriendResponseObject },
   };
 }
 
@@ -399,12 +436,13 @@ export async function performFriendRemovalAction(
   const databaseInstance = CoveyTownDatabase.getInstance();
 
   const responseObj = await databaseInstance.processFriendRemoveAction(
-    requestData.friend, requestData.user
+    requestData.friend,
+    requestData.user,
   );
 
   return {
     isOK: responseObj,
-    response: {requestSentSuccess: responseObj}
+    response: { requestSentSuccess: responseObj },
   };
 }
 
@@ -414,12 +452,13 @@ export async function performCancelFriendRequest(
   const databaseInstance = CoveyTownDatabase.getInstance();
 
   const responseObj = await databaseInstance.cancelFriendRequest(
-    requestData.friendRequestSender, requestData.friendRequestRecipient
+    requestData.friendRequestSender,
+    requestData.friendRequestRecipient,
   );
 
   return {
     isOK: responseObj,
-    response: {requestSentSuccess: responseObj}
+    response: { requestSentSuccess: responseObj },
   };
 }
 

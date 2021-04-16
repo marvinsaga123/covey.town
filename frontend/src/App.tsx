@@ -1,4 +1,4 @@
-import { ChakraProvider, HStack } from '@chakra-ui/react';
+import { ChakraProvider, HStack, VStack } from '@chakra-ui/react';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import assert from 'assert';
 import React, {
@@ -18,6 +18,8 @@ import Player, { ServerPlayer, UserLocation } from './classes/Player';
 import TownsServiceClient, { TownJoinResponse } from './classes/TownsServiceClient';
 import UserServiceClient from './classes/UserServiceClient';
 import Video from './classes/Video/Video';
+import FriendsInfoButton from './components/Buttons/FriendsInfoButton/FriendsInfoButton';
+import SearchUsersButton from './components/Buttons/SearchUsersButton/SearchUsersButton';
 import CurrentVideoChatUsersList from './components/CurrentVideoChatUsersList/CurrentVideoChatUsersList';
 import InitialLandingPage from './components/InitialLandingPage/InitialLandingPage';
 import Login from './components/Login/Login';
@@ -54,7 +56,7 @@ function defaultAppState(): CoveyAppState {
       moving: false,
     },
     emitMovement: () => {},
-    apiClient: new TownsServiceClient(),
+    townsClient: new TownsServiceClient(),
     userClient: new UserServiceClient(),
     friendsClient: new FriendsServiceClient(),
     isLoggedIn: false,
@@ -74,7 +76,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     userName: state.userName,
     socket: state.socket,
     emitMovement: state.emitMovement,
-    apiClient: state.apiClient,
+    townsClient: state.townsClient,
     userClient: state.userClient,
     friendsClient: state.friendsClient,
     isLoggedIn: state.isLoggedIn,
@@ -276,7 +278,11 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
       <div>
         <HStack alignItems='flex-start'>
           <WorldMap />
-          <CurrentVideoChatUsersList />
+          <VStack flex={1} alignItems='stretch' height='80vh' paddingRight='0.5em'>
+            <CurrentVideoChatUsersList />
+            <SearchUsersButton />
+            <FriendsInfoButton />
+          </VStack>
         </HStack>
         <VideoOverlay preferredMode='fullwidth' dispatchUpdate={dispatchAppUpdate} />
       </div>

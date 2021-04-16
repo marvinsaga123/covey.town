@@ -5,7 +5,9 @@ import { fireEvent, render, RenderResult, waitFor, within } from '@testing-libra
 import userEvent, { TargetElement } from '@testing-library/user-event';
 import { nanoid } from 'nanoid';
 import React from 'react';
+import FriendsServiceClient from '../../classes/FriendsServiceClient';
 import TownsServiceClient, { TownListResponse } from '../../classes/TownsServiceClient';
+import UserServiceClient from '../../classes/UserServiceClient';
 import Video from '../../classes/Video/Video';
 import CoveyAppContext from '../../contexts/CoveyAppContext';
 import TownSelection from './TownSelection';
@@ -103,7 +105,9 @@ function wrappedTownSelection() {
             moving: false,
           },
           emitMovement: () => {},
-          apiClient: new TownsServiceClient(),
+          townsClient: new TownsServiceClient(),
+          userClient: new UserServiceClient(),
+          friendsClient: new FriendsServiceClient(),
           isRegistering: false,
           isLoggedIn: false,
         }}>
@@ -322,7 +326,6 @@ describe('Town Selection - depends on Part 1 passing', () => {
             const row = rows.find(each => within(each).queryByText(town.coveyTownID));
             if (row) {
               const button = within(row).getByRole('button');
-              const username = nanoid();
               userEvent.click(button);
               await waitFor(() => expect(mockVideoSetup).toBeCalled());
               await waitFor(() =>

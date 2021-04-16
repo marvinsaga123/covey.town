@@ -4,7 +4,9 @@ import '@testing-library/jest-dom';
 import { render, waitFor, within } from '@testing-library/react';
 import { nanoid } from 'nanoid';
 import React from 'react';
+import FriendsServiceClient from '../../classes/FriendsServiceClient';
 import TownsServiceClient from '../../classes/TownsServiceClient';
+import UserServiceClient from '../../classes/UserServiceClient';
 import Video from '../../classes/Video/Video';
 import CoveyAppContext from '../../contexts/CoveyAppContext';
 import TownSelection from './TownSelection';
@@ -102,7 +104,9 @@ function wrappedTownSelection() {
             moving: false,
           },
           emitMovement: () => {},
-          apiClient: new TownsServiceClient(),
+          townsClient: new TownsServiceClient(),
+          userClient: new UserServiceClient(),
+          friendsClient: new FriendsServiceClient(),
           isRegistering: false,
           isLoggedIn: false,
         }}>

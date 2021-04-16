@@ -6,7 +6,6 @@ import {
   FormControl,
   FormLabel,
   Heading,
-  HStack,
   Input,
   Stack,
   Table,
@@ -30,7 +29,7 @@ interface TownSelectionProps {
 }
 
 export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Element {
-  const { apiClient, userName: appStateUserName } = useCoveyAppState();
+  const { townsClient, userName: appStateUserName } = useCoveyAppState();
   const [userName] = useState<string>(Video.instance()?.userName || appStateUserName);
   const [newTownName, setNewTownName] = useState<string>('');
   const [newTownIsPublic, setNewTownIsPublic] = useState<boolean>(true);
@@ -40,11 +39,10 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
   const toast = useToast();
 
   const updateTownListings = useCallback(() => {
-    // console.log(apiClient);
-    apiClient.listTowns().then(towns => {
+    townsClient.listTowns().then(towns => {
       setCurrentPublicTowns(towns.towns.sort((a, b) => b.currentOccupancy - a.currentOccupancy));
     });
-  }, [setCurrentPublicTowns, apiClient]);
+  }, [setCurrentPublicTowns, townsClient]);
   useEffect(() => {
     updateTownListings();
     const timer = setInterval(updateTownListings, 2000);
@@ -100,7 +98,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
       return;
     }
     try {
-      const newTownInfo = await apiClient.createTown({
+      const newTownInfo = await townsClient.createTown({
         friendlyName: newTownName,
         isPubliclyListed: newTownIsPublic,
       });
@@ -239,146 +237,6 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
           </Box>
         </Stack>
       </form>
-      <HStack>
-        <Button
-          backgroundColor='white'
-          color='#5F2EEA'
-          borderColor='#5F2EEA'
-          borderWidth='1px'
-          as='kbd'
-          data-testid='RegisterButton'
-          fontSize={10}
-          onClick={async () => {
-            try {
-              await apiClient
-                .processFriendRequestAction({
-                  action: 'accept',
-                  friendRequestSender: 'Testing',
-                  friendRequestRecipient: 'Marvin',
-                })
-                .then(res => {
-                  console.log('Response!');
-                  console.log(res);
-                })
-                .catch(err => {
-                  throw err;
-                });
-            } catch (err) {
-              toast({
-                title: 'Accept Request Error!',
-                description: err.toString(),
-                status: 'error',
-              });
-            }
-          }}>
-          Test Accept Friend Request
-        </Button>
-        <Button
-          backgroundColor='white'
-          color='#5F2EEA'
-          borderColor='#5F2EEA'
-          borderWidth='1px'
-          as='kbd'
-          fontSize={10}
-          data-testid='RegisterButton'
-          onClick={async () => {
-            try {
-              await apiClient
-                .processFriendRequestAction({
-                  action: 'deny',
-                  friendRequestSender: 'Marvin',
-                  friendRequestRecipient: 'Mike',
-                })
-                .then(res => {
-                  console.log('Response!');
-                  console.log(res);
-                })
-                .catch(err => {
-                  throw err;
-                });
-            } catch (err) {
-              toast({
-                title: 'Accept Request Error!',
-                description: err.toString(),
-                status: 'error',
-              });
-            }
-          }}>
-          Test Deny Friend Request
-        </Button>
-      </HStack>
-      <HStack>
-        <Button
-          backgroundColor='white'
-          color='#5F2EEA'
-          borderColor='#5F2EEA'
-          borderWidth='1px'
-          as='kbd'
-          data-testid='RegisterButton'
-          fontSize={10}
-          onClick={async () => {
-            try {
-              await apiClient
-                .processFriendsListAction({
-                  action: 'getPendingFriendRequests',
-                  forUser: userName,
-                })
-                .then(res => {
-                  toast({
-                    title: 'Pending Friend Requests!',
-                    description: res.listOfUsers.toString(),
-                    status: 'success',
-                  });
-                })
-                .catch(err => {
-                  throw err;
-                });
-            } catch (err) {
-              toast({
-                title: 'Accept Request Error!',
-                description: err.toString(),
-                status: 'error',
-              });
-            }
-          }}>
-          Test View Pending Friend Requests
-        </Button>
-        <Button
-          backgroundColor='white'
-          color='#5F2EEA'
-          borderColor='#5F2EEA'
-          borderWidth='1px'
-          as='kbd'
-          data-testid='RegisterButton'
-          fontSize={10}
-          onClick={async () => {
-            try {
-              await apiClient
-                .processFriendsListAction({
-                  action: 'getCurrentListOfFriends',
-                  forUser: userName,
-                })
-                .then(res => {
-                  toast({
-                    title: 'Current Friends!',
-                    description: res.listOfUsers.toString(),
-                    status: 'success',
-                  });
-                })
-                .catch(err => {
-                  throw err;
-                });
-            } catch (err) {
-              toast({
-                title: 'Accept Request Error!',
-                description: err.toString(),
-                status: 'error',
-              });
-            }
-          }}>
-          Test Get Current Friends List
-        </Button>
-      </HStack>
     </>
   );
 }

@@ -1,14 +1,13 @@
 import { Client } from 'pg';
-import { CoveyTownList, Friend, FriendRequestAction, Friendship, FriendsListActionName, FriendsListResponse, SearchResponse } from '../CoveyTypes';
-import { SearchUsersResponse } from '../requestHandlers/CoveyTownRequestHandlers';
-import CoveyTownsStore from '../lib/CoveyTownsStore';
-import { F } from 'ramda';
 import {
-  FriendRequestAction,
+  Friend,
+  Friendship,
   FriendsListActionName,
   FriendsListDatabaseResponse,
   RegisterDatabaseResponse,
+  SearchResponse,
 } from '../CoveyTypes';
+import CoveyTownsStore from './CoveyTownsStore';
 
 export default class CoveyTownDatabase {
   private static _instance: CoveyTownDatabase;
@@ -133,7 +132,7 @@ export default class CoveyTownDatabase {
       userId = userRes.rows[0].id;
 
       const friendDeletionQuery =
-      'DELETE FROM friends WHERE (sender_id=$1 and recipient_id=$2) OR (sender_id=$2 and recipient_id=$1)';
+        'DELETE FROM friends WHERE (sender_id=$1 and recipient_id=$2) OR (sender_id=$2 and recipient_id=$1)';
       const friendDeletionQueryValues = [friendId, userId];
 
       await this.client.query(friendDeletionQuery, friendDeletionQueryValues);
@@ -158,7 +157,7 @@ export default class CoveyTownDatabase {
       recipientId = recipientRes.rows[0].id;
 
       const requestCancelQuery =
-      'DELETE FROM friend_requests WHERE (sender_id=$1 and recipient_id=$2)';
+        'DELETE FROM friend_requests WHERE (sender_id=$1 and recipient_id=$2)';
 
       await this.client.query(requestCancelQuery, [senderId, recipientId]);
 
@@ -182,88 +181,88 @@ export default class CoveyTownDatabase {
     }
   }
 
-
   async searchUsers(userName: string, currUser: string): Promise<SearchResponse> {
     const currUserIdQuery = 'SELECT id FROM users WHERE username=$1';
     const currUserIdQueryValues = [currUser];
-    console.log("in db")
 
     try {
-      //get the user Id of the current user
+      // get the user Id of the current user
       const currUserIdResponse = await this.client.query(currUserIdQuery, currUserIdQueryValues);
       const currUserId = currUserIdResponse.rows[0].id;
 
-      //search for all users matching the given username and friendship information
-      const query = `SELECT DISTINCT users.id, username, friends.sender_id as friends, friend_requests.sender_id as requests FROM users FULL JOIN friends ON (users.id = friends.sender_id AND $2 = friends.recipient_id) OR (users.id = friends.recipient_id AND $2 = friends.sender_id) FULL JOIN friend_requests ON (users.id = friend_requests.sender_id AND $2 = friend_requests.recipient_id) OR (users.id = friend_requests.recipient_id AND $2 = friend_requests.sender_id) WHERE username LIKE $1`;
-      const values = [userName + '%', currUserId];
+      // search for all users matching the given username and friendship information
+      const query =
+        'SELECT DISTINCT users.id, username, friends.sender_id as friends, friend_requests.sender_id as requests FROM users FULL JOIN friends ON (users.id = friends.sender_id AND $2 = friends.recipient_id) OR (users.id = friends.recipient_id AND $2 = friends.sender_id) FULL JOIN friend_requests ON (users.id = friend_requests.sender_id AND $2 = friend_requests.recipient_id) OR (users.id = friend_requests.recipient_id AND $2 = friend_requests.sender_id) WHERE username LIKE $1';
+      const values = [`${userName}%`, currUserId];
 
-      const res = await this.client.query(query, values)
-      
-      //if no users match the given username, return
+      const res = await this.client.query(query, values);
+
+      // if no users match the given username, return
       if (res.rows.length === 0) {
         return {
           success: true,
-          listOfUsers: []
+          listOfUsers: [],
         };
       }
 
-      let fetchedUsers: Friendship[] = [];
+      const fetchedUsers: Friendship[] = [];
 
-      //if there are users that match the given username, determine if they are friends with the current user
+      // if there are users that match the given username, determine if they are friends with the current user
       res.rows.forEach(row => {
-        var friends = false;
+        let friends = false;
+
         if (row.friends != null || row.requests != null) {
           friends = true;
         }
-        var friendship = {username: row.username, friendship: friends}
-     
+
+        const friendship = { username: row.username, friendship: friends };
+
         fetchedUsers.push(friendship);
-      })
+      });
 
       return {
         success: true,
-        listOfUsers: fetchedUsers
+        listOfUsers: fetchedUsers,
       };
     } catch (err) {
-      console.log(err)
       return {
         success: false,
-        listOfUsers: []
-      };    
+        listOfUsers: [],
+      };
     }
   }
 
   async sendFriendRequest(sender: string, recipient: string): Promise<boolean> {
-      let senderId: number;
-      let recipientId: number;
-  
-      const senderIdQuery = 'SELECT id FROM users WHERE username=$1';
-      const senderIdQueryValues = [sender];
-  
-      const recipientIdQuery = 'SELECT id FROM users WHERE username=$1';
-      const recipientIdQueryValues = [recipient];
+    let senderId: number;
+    let recipientId: number;
 
-      try {
-        const senderRes = await this.client.query(senderIdQuery, senderIdQueryValues);
-        const recipientRes = await this.client.query(recipientIdQuery, recipientIdQueryValues);
-  
-        if (senderRes.rows[0] === undefined || recipientRes.rows[0] === undefined) {
-          return false;
-        }
-  
-        senderId = senderRes.rows[0].id;
-        recipientId = recipientRes.rows[0].id;
+    const senderIdQuery = 'SELECT id FROM users WHERE username=$1';
+    const senderIdQueryValues = [sender];
 
-        const friendRequestEntryQuery = 'INSERT INTO friend_requests (sender_id, recipient_id) VALUES ($1, $2)';
-        const friendRequestEntryValues = [senderId, recipientId];
-  
-        await this.client.query(friendRequestEntryQuery, friendRequestEntryValues);
-  
-        return true;
-      } catch (err) {
-        console.log(err)
-        return false; 
+    const recipientIdQuery = 'SELECT id FROM users WHERE username=$1';
+    const recipientIdQueryValues = [recipient];
+
+    try {
+      const senderRes = await this.client.query(senderIdQuery, senderIdQueryValues);
+      const recipientRes = await this.client.query(recipientIdQuery, recipientIdQueryValues);
+
+      if (senderRes.rows[0] === undefined || recipientRes.rows[0] === undefined) {
+        return false;
       }
+
+      senderId = senderRes.rows[0].id;
+      recipientId = recipientRes.rows[0].id;
+
+      const friendRequestEntryQuery =
+        'INSERT INTO friend_requests (sender_id, recipient_id) VALUES ($1, $2)';
+      const friendRequestEntryValues = [senderId, recipientId];
+
+      await this.client.query(friendRequestEntryQuery, friendRequestEntryValues);
+
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 
   async processFriendsListAction(
@@ -272,7 +271,7 @@ export default class CoveyTownDatabase {
   ): Promise<FriendsListDatabaseResponse> {
     let forUserId: number;
     let query = 'SELECT id FROM users WHERE username=$1';
-    let values: string[] | number[] | [number[]] = [forUser];
+    const values: string[] | number[] | [number[]] = [forUser];
 
     try {
       // get the user id for the passed in username
@@ -283,14 +282,14 @@ export default class CoveyTownDatabase {
       }
 
       forUserId = userIdRes.rows[0].id;
-      let fetchedUsers: Friend[] = [];
+      const fetchedUsers: Friend[] = [];
 
       // query the appropriate tables to get a list of user info
       if (action === 'getPendingFriendRequests') {
-        const query = 'SELECT DISTINCT * FROM users AS u INNER JOIN friend_requests AS f1 ON (u.id = f1.sender_id OR u.id = f1.recipient_id) WHERE (f1.recipient_id = $1 OR f1.sender_id = $1)';
+        query =
+          'SELECT DISTINCT * FROM users AS u INNER JOIN friend_requests AS f1 ON (u.id = f1.sender_id OR u.id = f1.recipient_id) WHERE (f1.recipient_id = $1 OR f1.sender_id = $1)';
 
         const queryRes = await this.client.query(query, [forUserId]);
-        console.log("here:", queryRes.rows, forUserId)
 
         if (queryRes.rows.length === 0) {
           return {
@@ -302,56 +301,90 @@ export default class CoveyTownDatabase {
         queryRes.rows.forEach(row => {
           let friend: Friend;
           if (row.sender_id === forUserId) {
-            friend = {username: row.username, online: false, room: "", requestSender: forUser, requestRecipient: row.username}
+            friend = {
+              username: row.username,
+              online: false,
+              room: '',
+              requestSender: forUser,
+              requestRecipient: row.username,
+            };
           } else {
-           friend = {username: row.username, online: false, room: "", requestSender: row.username, requestRecipient: forUser}
-          }
-           fetchedUsers.push(friend);
-        })      
-        
-      } else {
-          const query = `SELECT * FROM users INNER JOIN friends ON (users.id = friends.sender_id OR users.id = friends.recipient_id) WHERE (friends.recipient_id = $1 OR friends.sender_id = $1)`;
-          
-          let queryRes = await this.client.query(query, [forUserId]);
-
-          if (queryRes.rows.length === 0) {
-            return {
-              success: true,
-              response: [],
+            friend = {
+              username: row.username,
+              online: false,
+              room: '',
+              requestSender: row.username,
+              requestRecipient: forUser,
             };
           }
+          fetchedUsers.push(friend);
+        });
+      } else {
+        query =
+          'SELECT * FROM users INNER JOIN friends ON (users.id = friends.sender_id OR users.id = friends.recipient_id) WHERE (friends.recipient_id = $1 OR friends.sender_id = $1)';
 
-          const townsStore = CoveyTownsStore.getInstance();
-          const towns = townsStore.getTowns();
+        const queryRes = await this.client.query(query, [forUserId]);
 
-          queryRes.rows.forEach(row => {
-            let friend: Friend;
-            if (row.current_room) {
-              let currRoom = towns.find(t => t.friendlyName === row.current_room);
-              if (currRoom) {
-                let controller = townsStore.getControllerForTown(currRoom.coveyTownID);
-                if (controller && controller.isPubliclyListed) {
-                  friend = {username: row.username, online: true, room: row.current_room, requestSender: "", requestRecipient: ""}
-                } else {
-                  friend = {username: row.username, online: true, room: "", requestSender: "", requestRecipient: ""}
-                }
+        if (queryRes.rows.length === 0) {
+          return {
+            success: true,
+            response: [],
+          };
+        }
+
+        const townsStore = CoveyTownsStore.getInstance();
+        const towns = townsStore.getTowns();
+
+        queryRes.rows.forEach(row => {
+          let friend: Friend;
+          if (row.current_room) {
+            const currRoom = towns.find(t => t.friendlyName === row.current_room);
+            if (currRoom) {
+              const controller = townsStore.getControllerForTown(currRoom.coveyTownID);
+              if (controller && controller.isPubliclyListed) {
+                friend = {
+                  username: row.username,
+                  online: true,
+                  room: row.current_room,
+                  requestSender: '',
+                  requestRecipient: '',
+                };
               } else {
-                friend = {username: row.username, online: true, room: "", requestSender: "", requestRecipient: ""}
+                friend = {
+                  username: row.username,
+                  online: true,
+                  room: '',
+                  requestSender: '',
+                  requestRecipient: '',
+                };
               }
             } else {
-              friend = {username: row.username, online: false, room: "", requestSender: "", requestRecipient: ""}
+              friend = {
+                username: row.username,
+                online: true,
+                room: '',
+                requestSender: '',
+                requestRecipient: '',
+              };
             }
-            fetchedUsers.push(friend);
-          })
-      } 
+          } else {
+            friend = {
+              username: row.username,
+              online: false,
+              room: '',
+              requestSender: '',
+              requestRecipient: '',
+            };
+          }
+          fetchedUsers.push(friend);
+        });
+      }
 
       return {
         success: true,
         response: fetchedUsers,
       };
-
     } catch (err) {
-      console.log(err)
       return {
         success: false,
         response: [],

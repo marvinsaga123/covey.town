@@ -5,7 +5,9 @@ import { fireEvent, render, RenderResult, waitFor } from '@testing-library/react
 import { TargetElement } from '@testing-library/user-event';
 import { nanoid } from 'nanoid';
 import React from 'react';
+import FriendsServiceClient from '../../classes/FriendsServiceClient';
 import TownsServiceClient from '../../classes/TownsServiceClient';
+import UserServiceClient from '../../classes/UserServiceClient';
 import CoveyAppContext from '../../contexts/CoveyAppContext';
 import TownSettings from './TownSettings';
 
@@ -31,7 +33,7 @@ const mockDeleteTown = jest.fn();
 TownsServiceClient.prototype.updateTown = mockUpdateTown;
 TownsServiceClient.prototype.deleteTown = mockDeleteTown;
 // @ts-ignore
-mockUseCoveyAppState.apiClient = new TownsServiceClient();
+mockUseCoveyAppState.townsClient = new TownsServiceClient();
 
 function wrappedTownSettings() {
   return (
@@ -54,7 +56,9 @@ function wrappedTownSettings() {
             moving: false,
           },
           emitMovement: () => {},
-          apiClient: new TownsServiceClient(),
+          townsClient: new TownsServiceClient(),
+          userClient: new UserServiceClient(),
+          friendsClient: new FriendsServiceClient(),
           isRegistering: false,
           isLoggedIn: false,
         }}>
@@ -130,7 +134,7 @@ describe('Part 4 - Town Settings', () => {
     renderData.unmount();
   });
   describe('Updating a town', () => {
-    it('Passes the form values to apiClient.updateTown', async () => {
+    it('Passes the form values to townsClient.updateTown', async () => {
       const params = {
         friendlyName: nanoid(),
         isPubliclyListed: false,
@@ -187,7 +191,7 @@ describe('Part 4 - Town Settings', () => {
 
       await waitFor(() => expect(mockUseDisclosure.onClose).toBeCalled());
     });
-    it("Displays a toast 'Unable to update town' if an error is thrown by apiClient.updateTown", async () => {
+    it("Displays a toast 'Unable to update town' if an error is thrown by townsClient.updateTown", async () => {
       const params = {
         friendlyName: nanoid(),
         isPubliclyListed: false,
@@ -219,7 +223,7 @@ describe('Part 4 - Town Settings', () => {
     });
   });
   describe('Deleting a town', () => {
-    it('Passes the form values to apiClient.deleteTown', async () => {
+    it('Passes the form values to townsClient.deleteTown', async () => {
       const params = {
         friendlyName: nanoid(),
         isPubliclyListed: true,
@@ -274,7 +278,7 @@ describe('Part 4 - Town Settings', () => {
       expect(mockUpdateTown).not.toBeCalled();
       await waitFor(() => expect(mockUseDisclosure.onClose).toBeCalled());
     });
-    it("Displays a toast 'Unable to delete town' if an error is thrown by apiClient.deleteTown", async () => {
+    it("Displays a toast 'Unable to delete town' if an error is thrown by townsClient.deleteTown", async () => {
       const params = {
         friendlyName: nanoid(),
         isPubliclyListed: false,

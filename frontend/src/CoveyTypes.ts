@@ -1,9 +1,8 @@
 import { Socket } from 'socket.io-client';
+import FriendsServiceClient from './classes/FriendsServiceClient';
 import Player, { UserLocation } from './classes/Player';
 import TownsServiceClient from './classes/TownsServiceClient';
 import UserServiceClient from './classes/UserServiceClient';
-import FriendsServiceClient from './classes/FriendsServiceClient';
-
 
 export type CoveyEvent = 'playerMoved' | 'playerAdded' | 'playerRemoved';
 
@@ -33,7 +32,7 @@ export type CoveyAppState = {
   nearbyPlayers: NearbyPlayers;
   emitMovement: (location: UserLocation) => void;
   socket: Socket | null;
-  apiClient: TownsServiceClient;
+  townsClient: TownsServiceClient;
   userClient: UserServiceClient;
   friendsClient: FriendsServiceClient;
   isLoggedIn: boolean;
@@ -61,8 +60,13 @@ export type CoveyAppUpdate =
   | { action: 'weMoved'; location: UserLocation }
   | { action: 'disconnect' }
   | { action: 'register'; data: { isRegistering: boolean } }
-  | { action: 'finishRegistration'; data: {isRegistering: boolean}}
+  | { action: 'finishRegistration'; data: { isRegistering: boolean } }
   | { action: 'loggedIn'; data: { isLoggedIn: boolean; userName: string } }
   | { action: 'logout'; data: { isLoggedIn: boolean; userName: string } };
 
 export type FriendRequestAction = 'accept' | 'deny';
+
+export type Friendship = {
+  username: string;
+  friendship: boolean;
+};

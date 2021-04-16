@@ -1,6 +1,5 @@
 import assert from 'assert';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { ServerPlayer } from './Player';
 
 type FriendsListActionName = 'getPendingFriendRequests' | 'getCurrentListOfFriends';
 
@@ -43,36 +42,40 @@ export interface FriendRequest {
   friendRequestRecipient: string;
 }
 
+/**
+ * The format of a request to send a friend request, as dispatched by sever middleware
+ */
 export interface AddFriendRequest {
   /** userName to be searched for */
   recipient: string;
   sender: string;
 }
 
+/**
+ * The format of a response to send a friend request, as dispatched by the handler to the server
+ * middleware
+ */
 export interface AddFriendResponse {
   /** Does a user exist that matches the given username? */
   requestSentSuccess: boolean;
 }
 
+/**
+ * The format of a request to cancel a friend request, as dispatched by sever middleware
+ */
 export interface RemoveFriendRequest {
   /** userName to be searched for */
   friend: string;
   user: string;
 }
 
+/**
+ * The format of a response to cancel a friend reques or remove a current friend, as dispatched by the
+ * handler to the server middleware
+ */
 export interface RemoveFriendResponse {
   /** Does a user exist that matches the given username? */
   requestSentSuccess: boolean;
-}
-
-/**
- * The format of a request to join a Town in Covey.Town, as dispatched by the server middleware
- */
-export interface TownJoinRequest {
-  /** userName of the player that would like to join * */
-  userName: string;
-  /** ID of the town that the player would like to join * */
-  coveyTownID: string;
 }
 
 /**
@@ -119,16 +122,17 @@ export default class FriendsServiceClient {
     throw new Error(`Error processing request: ${response.data.message}`);
   }
 
-  async processFriendRequestAction(requestData: FriendRequest): Promise<AddFriendResponse> {
-    let responseWrapper: AxiosResponse<ResponseEnvelope<AddFriendResponse>>;
+  // accepting or denying a friend quest
+  async processFriendRequestAction(requestData: FriendRequest): Promise<void> {
+    let responseWrapper: AxiosResponse<ResponseEnvelope<void>>;
 
     if (requestData.action === 'accept') {
-      responseWrapper = await this._axios.post<ResponseEnvelope<AddFriendResponse>>(
+      responseWrapper = await this._axios.post<ResponseEnvelope<void>>(
         '/acceptFriendRequest',
         requestData,
       );
     } else {
-      responseWrapper = await this._axios.post<ResponseEnvelope<AddFriendResponse>>(
+      responseWrapper = await this._axios.post<ResponseEnvelope<void>>(
         '/denyFriendRequest',
         requestData,
       );
@@ -137,6 +141,7 @@ export default class FriendsServiceClient {
     return FriendsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
+  // process an action on the friends list
   async processFriendsListAction(
     requestData: FriendsListActionRequest,
   ): Promise<FriendsListActionResponse> {
@@ -154,21 +159,30 @@ export default class FriendsServiceClient {
     return FriendsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
+  // send a friend request to a user
   async addFriend(requestData: AddFriendRequest): Promise<AddFriendResponse> {
     const responseWrapper = await this._axios.post<ResponseEnvelope<AddFriendResponse>>(
-      '/addFriend', requestData);
+      '/addFriend',
+      requestData,
+    );
     return FriendsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
+  // remove a user from a user's friends list
   async removeFriend(requestData: RemoveFriendRequest): Promise<RemoveFriendResponse> {
     const responseWrapper = await this._axios.post<ResponseEnvelope<RemoveFriendResponse>>(
-      '/removeFriend', requestData);
+      '/removeFriend',
+      requestData,
+    );
     return FriendsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
+  // cancel a friend request to a user
   async cancelFriendRequest(requestData: FriendRequest): Promise<RemoveFriendResponse> {
     const responseWrapper = await this._axios.post<ResponseEnvelope<RemoveFriendResponse>>(
-      '/cancelFriendRequest', requestData);
+      '/cancelFriendRequest',
+      requestData,
+    );
     return FriendsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 }

@@ -3,8 +3,6 @@ import React, { useEffect, useState } from 'react';
 import Player, { UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
-import SearchUsersButton from '../VideoCall/VideoFrontend/components/Buttons/SearchUsersButton/SearchUsersButton';
-import FriendsInfoButton from '../VideoCall/VideoFrontend/components/Buttons/FriendsInfoButton/FriendsInfoButton';
 
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
 class CoveyGameScene extends Phaser.Scene {
@@ -187,11 +185,13 @@ class CoveyGameScene extends Phaser.Scene {
       const isMoving = primaryDirection !== undefined;
       this.player.label.setX(body.x);
       this.player.label.setY(body.y - 20);
-      if (!this.lastLocation
-        || this.lastLocation.x !== body.x
-        || this.lastLocation.y !== body.y
-        || (isMoving && this.lastLocation.rotation !== primaryDirection)
-        || this.lastLocation.moving !== isMoving) {
+      if (
+        !this.lastLocation ||
+        this.lastLocation.x !== body.x ||
+        this.lastLocation.y !== body.y ||
+        (isMoving && this.lastLocation.rotation !== primaryDirection) ||
+        this.lastLocation.moving !== isMoving
+      ) {
         if (!this.lastLocation) {
           this.lastLocation = {
             x: body.x,
@@ -429,7 +429,7 @@ class CoveyGameScene extends Phaser.Scene {
 
   resume() {
     this.paused = false;
-    if(Video.instance()){
+    if (Video.instance()) {
       // If the game is also in process of being torn down, the keyboard could be undefined
       this.input.keyboard.addCapture(this.previouslyCapturedKeys);
     }
@@ -477,8 +477,5 @@ export default function WorldMap(): JSX.Element {
     gameScene?.updatePlayersLocations(players);
   }, [players, deepPlayers, gameScene]);
 
-  return <div id='map-container'>
-          <SearchUsersButton/>
-          <FriendsInfoButton/>
-    </div>;
+  return <div id='map-container' />;
 }

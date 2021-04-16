@@ -4,25 +4,14 @@ import { Server } from 'http';
 import { StatusCodes } from 'http-status-codes';
 import io from 'socket.io';
 import {
-  acceptFriendRequestHandler,
-  denyFriendRequestHandler,
   loginHandler,
-  performFriendsListAction,
   performUserSearchAction,
-  performAddFriendAction,
-  townCreateHandler,
-  townDeleteHandler,
-  townJoinHandler,
-  townListHandler,
+  registerHandler,
   townSubscriptionHandler,
-  townUpdateHandler,
-  performFriendRemovalAction,
-  performCancelFriendRequest
 } from '../requestHandlers/CoveyTownRequestHandlers';
 import { logError } from '../Utils';
 
 export default function addUserRoutes(http: Server, app: Express): io.Server {
-
   /**
    * Login to Covey.Town
    */
@@ -41,12 +30,32 @@ export default function addUserRoutes(http: Server, app: Express): io.Server {
     }
   });
 
+  /**
+   * Register an account for Covey.Town
+   */
+  app.post('/register', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await registerHandler({
+        userName: req.body.userName,
+        password: req.body.password,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  /**
+   * Search for a user using the specified string
+   */
   app.get('/searchUsers/:currUser/:userName', BodyParser.json(), async (req, res) => {
-    console.log("in towns")
     try {
       const result = await performUserSearchAction({
         userName: req.params.userName,
-        currUser: req.params.currUser
+        currUser: req.params.currUser,
       });
 
       res.status(StatusCodes.OK).json(result);
