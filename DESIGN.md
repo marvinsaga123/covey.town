@@ -18,9 +18,7 @@ The previous implementation of the `RoomsService` from the original repository w
 
 #### New Features Handled by `RoomsService`
 
-- WIP
-- WIP
-- WIP
+- Join a friend's room if that Covey.Town room is currently public
 
 ### `UserService`
 
