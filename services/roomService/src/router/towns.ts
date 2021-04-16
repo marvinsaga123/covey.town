@@ -10,6 +10,7 @@ import {
   performFriendsListAction,
   performUserSearchAction,
   performAddFriendAction,
+  registerHandler,
   townCreateHandler,
   townDeleteHandler,
   townJoinHandler,
@@ -48,6 +49,104 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
       const result = await loginHandler({
         userName: req.body.userName,
         password: req.body.password,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  /**
+   * Register an Account to Covey.Town
+   */
+  app.post('/register', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await registerHandler({
+        userName: req.body.userName,
+        password: req.body.password,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  /**
+   * Accept a Friend Request
+   */
+  app.post('/acceptFriendRequest', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await acceptFriendRequestHandler({
+        action: req.body.action,
+        friendRequestSender: req.body.friendRequestSender,
+        friendRequestRecipient: req.body.friendRequestRecipient,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  /**
+   * Deny a Friend Request
+   */
+  app.post('/denyFriendRequest', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await denyFriendRequestHandler({
+        action: req.body.action,
+        friendRequestSender: req.body.friendRequestSender,
+        friendRequestRecipient: req.body.friendRequestRecipient,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  /**
+   * Get the pending friend requests for a user
+   */
+  app.get('/pendingFriendRequests/:forUser', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await performFriendsListAction({
+        action: {
+          actionName: 'getPendingFriendRequests',
+          errorMessage: 'Error occurred while getting pending friend requests. Please try again.',
+        },
+        forUser: req.params.forUser,
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  /**
+   * Get the friends list for a user
+   */
+  app.get('/listOfFriends/:forUser', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await performFriendsListAction({
+        action: {
+          actionName: 'getCurrentListOfFriends',
+          errorMessage: 'Error occurred while getting current list of friends. Please try again.',
+        },
+        forUser: req.params.forUser,
       });
       res.status(StatusCodes.OK).json(result);
     } catch (err) {

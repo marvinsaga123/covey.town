@@ -7,6 +7,27 @@ import CoveyTownListener from '../types/CoveyTownListener';
 import Player from '../types/Player';
 
 /**
+ * The format of a request to register to Covey.Town, as dispatched by the server middleware
+ */
+export interface RegisterRequest {
+  /** userName of the player attempting to login */
+  userName: string;
+  /** password of the player attempting to login */
+  password: string;
+}
+
+/**
+ * The format of a response to login to Covey.Town, as returned by the handler to the server
+ * middleware
+ */
+export interface RegisterResponse {
+  /** Does a user exist with the sent userName and passord? */
+  registerSuccessfully: boolean;
+  /** Error message if register was not successful */
+  errorMessage?: string;
+}
+
+/**
  * The format of a request to perform a friends list action on behalf of a user, as dispatched by server
  * middleware
  */
@@ -295,12 +316,12 @@ export async function performFriendsListAction(
 ): Promise<ResponseEnvelope<FriendsListActionResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
 
-  const friendsListResponseObject = await databaseInstance.processFriendsListAction(
+  const friendsListDatabaseResponseObject = await databaseInstance.processFriendsListAction(
     requestData.action.actionName,
     requestData.forUser,
   );
 
-  if (!friendsListResponseObject.success) {
+  if (!friendsListDatabaseResponseObject.success) {
     return {
       isOK: false,
       message: requestData.action.errorMessage,
@@ -309,7 +330,35 @@ export async function performFriendsListAction(
 
   return {
     isOK: true,
-    response: { listOfUsers: friendsListResponseObject.response },
+    response: { listOfUsers: friendsListDatabaseResponseObject.response },
+  };
+}
+
+export async function registerHandler(
+  requestData: RegisterRequest,
+): Promise<ResponseEnvelope<RegisterResponse>> {
+  const databaseInstance = CoveyTownDatabase.getInstance();
+
+  const registerDatabaseResponseObject = await databaseInstance.processRegister(
+    requestData.userName,
+    requestData.password,
+  );
+
+  if (!registerDatabaseResponseObject.success) {
+    return {
+      isOK: true,
+      response: {
+        registerSuccessfully: false,
+        errorMessage: registerDatabaseResponseObject.errorMessage,
+      },
+    };
+  }
+
+  return {
+    isOK: true,
+    response: {
+      registerSuccessfully: true,
+    },
   };
 }
 

@@ -57,4 +57,3 @@ export interface SendFriendRequestResponse {
   /** Does a user exist that matches the given username? */
   requestSentSuccess: boolean;
 }
-

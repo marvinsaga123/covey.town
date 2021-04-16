@@ -1,4 +1,4 @@
-# Covey.Town CS4530 Final Project FEATURES.md
+# Covey.Town CS4530 Final Project New Features Overview
 
 ## New Features Added: High Level
 

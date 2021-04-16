@@ -13,6 +13,27 @@ export type Friend = {
 };
 
 /**
+ * The format of a request to register an account in Covey.town, as dispatched by the server middleware
+ */
+export interface RegisterRequest {
+  /** userName of the player attempting to login */
+  userName: string;
+  /** password of the player attempting to login */
+  password: string;
+}
+
+/**
+ * The format of a response to login to Covey.Town, as returned by the handler to the server
+ * middleware
+ */
+export interface RegisterResponse {
+  /** Does a user exist with the sent userName and passord? */
+  registerSuccessfully: boolean;
+  /** Error message if register was not successful */
+  errorMessage?: string;
+}
+
+/**
  * The format of a request to perform a friends list action on behalf of a user, as dispatched by server
  * middleware
  */
@@ -233,8 +254,17 @@ export default class TownsServiceClient {
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
 
-  async processFriendRequestAction(requestData: FriendRequest): Promise<AddFriendResponse> {
-    let responseWrapper: AxiosResponse<ResponseEnvelope<AddFriendResponse>>;
+  async register(requestData: RegisterRequest): Promise<RegisterResponse> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<RegisterResponse>>(
+      '/register',
+      requestData,
+    );
+
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async processFriendRequestAction(requestData: FriendRequest): Promise<void> {
+    let responseWrapper: AxiosResponse<ResponseEnvelope<void>>;
 
     if (requestData.action === 'accept') {
       responseWrapper = await this._axios.post<ResponseEnvelope<AddFriendResponse>>(

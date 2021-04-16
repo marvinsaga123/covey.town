@@ -14,6 +14,7 @@ import {
 import React, { useState } from 'react';
 import { BiUser } from 'react-icons/bi';
 import { CoveyAppUpdate } from '../../CoveyTypes';
+import useCoveyAppState from '../../hooks/useCoveyAppState';
 
 interface InitialRegisterPageProps {
   dispatchUpdate: (update: CoveyAppUpdate) => void;
@@ -28,6 +29,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
   const [userId, setUserID] = useState<string>();
   const [userPassword, setUserPassword] = useState<string>();
   const [confirmPassword, setConfirmPassword] = useState<string>();
+  const { apiClient } = useCoveyAppState();
 
   const passwordIsValid = async () => {
     if (!userPassword || userPassword.length < 8) {
@@ -35,7 +37,6 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
     }
     let capital = false;
     let number = false;
-    let regularCharacter = false;
     let specialCharacter = false;
     for (let index = 0; index < userPassword.length; index += 1) {
       const num = userPassword.charAt(index);
@@ -43,8 +44,6 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
         number = true;
       } else if (num >= 'A' && num <= 'Z') {
         capital = true;
-      } else if (num >= 'a' && num <= 'z') {
-        regularCharacter = true;
       } else if (
         (num >= '!' && num <= '/') ||
         (num >= ':' && num <= '@') ||
@@ -55,7 +54,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
         specialCharacter = true;
       }
     }
-    if (capital && number && specialCharacter && regularCharacter) {
+    if (capital && number && specialCharacter) {
       return true;
     }
     return false;
@@ -65,8 +64,8 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
     try {
       if (!userId || !userPassword || !confirmPassword) {
         toast({
-          title: 'InfoNotFilled',
-          description: 'The username, password, and password confirmation need to be filled',
+          title: 'Required Fields Missing',
+          description: 'The username, password, and password confirmation need to be filled.',
           status: 'error',
           isClosable: true,
           duration: 3000,
@@ -76,40 +75,53 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
       const valid = await passwordIsValid();
       if (!valid) {
         toast({
-          title: 'Password Error',
+          title: 'Password Invalid',
           description:
-            'Password Invalid. there needs to be at least one capital letter,' +
-            'one number, and a special character(!@#$% etc...)' +
-            ' with minimum password length of 8',
+            'Password needs to have at least one capital letter, ' +
+            'one number, and a special character (!@#$% etc...) ' +
+            'with a minimum password length of 8.',
           status: 'error',
           isClosable: true,
-          duration: 3000,
+          duration: 6000,
         });
       } else if (userPassword !== confirmPassword) {
         toast({
-          title: 'PasswordConfirm Error',
-          description: 'Password Confirmation does not match the Password typed in, try again.',
+          title: 'Passwords Do Not Match',
+          description:
+            'Password confirmation does not match the original password typed in, please try again.',
           status: 'error',
           isClosable: true,
           duration: 3000,
         });
-      }
-
-      // else if: TODO = make sure that account wasnt already created by checking the database
-      else {
-        // TODO = add userName and password to database
-        toast({
-          title: 'Registration Success',
-          description: 'Successfullty created an Account',
-          status: 'success',
-          isClosable: true,
-          duration: 3000,
-        });
+      } else {
+        await apiClient
+          .register({ userName: userId, password: userPassword })
+          .then(res => {
+            if (res.registerSuccessfully) {
+              toast({
+                title: 'User Registered',
+                description: 'Successfullty created an account!',
+                status: 'success',
+                isClosable: true,
+                duration: 3000,
+              });
+              dispatchUpdate({
+                action: 'finishRegistration',
+                data: {
+                  isRegistering: false,
+                },
+              });
+            } else {
+              throw Error(res.errorMessage);
+            }
+          })
+          .catch(err => {
+            throw err;
+          });
       }
     } catch (err) {
       toast({
-        title: 'Error: ',
-        description: err,
+        description: err.toString(),
         status: 'error',
         isClosable: true,
         duration: 3000,
@@ -144,6 +156,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
               placeholder='Create a Username'
               value={userId}
               onChange={event => setUserID(event.target.value)}
+              focusBorderColor='#5F2EEA'
             />
           </FormControl>
         </HStack>
@@ -158,6 +171,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
               placeholder='Create a Password'
               value={userPassword}
               onChange={event => setUserPassword(event.target.value)}
+              focusBorderColor='#5F2EEA'
             />
           </FormControl>
           <Button onClick={handleShow}>{show ? 'Hide' : 'Show'}</Button>
@@ -173,6 +187,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
               placeholder='Confirm Password'
               value={confirmPassword}
               onChange={event => setConfirmPassword(event.target.value)}
+              focusBorderColor='#5F2EEA'
             />
           </FormControl>
           <Button onClick={handleShowConfirmation}>{showConfirmation ? 'Hide' : 'Show'}</Button>
@@ -195,7 +210,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
           borderWidth='1px'
           as='kbd'
           width='20vw'
-          data-testid='RegisterButton'
+          data-testid='AccountExistsButton'
           onClick={handleAccountExists}>
           Already have an account?
         </Button>

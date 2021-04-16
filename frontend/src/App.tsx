@@ -1,4 +1,4 @@
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, HStack } from '@chakra-ui/react';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import assert from 'assert';
 import React, {
@@ -18,6 +18,7 @@ import Player, { ServerPlayer, UserLocation } from './classes/Player';
 import TownsServiceClient, { TownJoinResponse } from './classes/TownsServiceClient';
 import UserServiceClient from './classes/UserServiceClient';
 import Video from './classes/Video/Video';
+import CurrentVideoChatUsersList from './components/CurrentVideoChatUsersList/CurrentVideoChatUsersList';
 import InitialLandingPage from './components/InitialLandingPage/InitialLandingPage';
 import Login from './components/Login/Login';
 import Register from './components/Register/Register';
@@ -113,6 +114,9 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     case 'register':
       nextState.isRegistering = update.data.isRegistering;
       break;
+    case 'finishRegistration':
+      nextState.isRegistering = update.data.isRegistering;
+      break;
     case 'doConnect':
       nextState.sessionToken = update.data.sessionToken;
       nextState.myPlayerID = update.data.myPlayerID;
@@ -166,7 +170,7 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
       break;
     case 'disconnect':
       state.socket?.disconnect();
-      return { ...defaultAppState(), isLoggedIn: true };
+      return { ...defaultAppState(), isLoggedIn: true, userName: state.userName };
     default:
       throw new Error('Unexpected state request');
   }
@@ -270,7 +274,10 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
 
     return (
       <div>
-        <WorldMap />
+        <HStack alignItems='flex-start'>
+          <WorldMap />
+          <CurrentVideoChatUsersList />
+        </HStack>
         <VideoOverlay preferredMode='fullwidth' dispatchUpdate={dispatchAppUpdate} />
       </div>
     );

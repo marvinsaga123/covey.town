@@ -155,6 +155,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
                     placeholder='New Town Name'
                     value={newTownName}
                     onChange={event => setNewTownName(event.target.value)}
+                    focusBorderColor='#5F2EEA'
                   />
                 </FormControl>
               </Box>
@@ -195,6 +196,7 @@ export default function TownSelection({ doLogin }: TownSelectionProps): JSX.Elem
                     placeholder='ID of town to join, or select from list'
                     value={townIDToJoin}
                     onChange={event => setTownIDToJoin(event.target.value)}
+                    focusBorderColor='#5F2EEA'
                   />
                 </FormControl>
                 <Button data-testid='joinTownByIDButton' onClick={() => handleJoin(townIDToJoin)}>

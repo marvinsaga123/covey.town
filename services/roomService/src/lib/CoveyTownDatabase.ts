@@ -3,6 +3,12 @@ import { CoveyTownList, Friend, FriendRequestAction, Friendship, FriendsListActi
 import { SearchUsersResponse } from '../requestHandlers/CoveyTownRequestHandlers';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
 import { F } from 'ramda';
+import {
+  FriendRequestAction,
+  FriendsListActionName,
+  FriendsListDatabaseResponse,
+  RegisterDatabaseResponse,
+} from '../CoveyTypes';
 
 export default class CoveyTownDatabase {
   private static _instance: CoveyTownDatabase;
@@ -39,6 +45,34 @@ export default class CoveyTownDatabase {
       return false;
     } catch (err) {
       return false;
+    }
+  }
+
+  async processRegister(userName: string, password: string): Promise<RegisterDatabaseResponse> {
+    try {
+      const lookUpUser = 'SELECT * FROM users WHERE username=$1';
+      const lookUpUserValues = [userName];
+      const res = await this.client.query(lookUpUser, lookUpUserValues);
+
+      if (res.rows.length === 0) {
+        const registerUser = 'INSERT INTO users (username,password) VALUES($1,$2)';
+        const registerUserValues = [userName, password];
+        await this.client.query(registerUser, registerUserValues);
+
+        return {
+          success: true,
+        };
+      }
+
+      return {
+        success: false,
+        errorMessage: 'That username is already in use. Please enter a different name.',
+      };
+    } catch (err) {
+      return {
+        success: false,
+        errorMessage: err.toString(),
+      };
     }
   }
 
@@ -235,7 +269,7 @@ export default class CoveyTownDatabase {
   async processFriendsListAction(
     action: FriendsListActionName,
     forUser: string,
-  ): Promise<FriendsListResponse> {
+  ): Promise<FriendsListDatabaseResponse> {
     let forUserId: number;
     let query = 'SELECT id FROM users WHERE username=$1';
     let values: string[] | number[] | [number[]] = [forUser];

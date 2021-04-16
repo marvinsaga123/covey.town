@@ -78,7 +78,7 @@ const IntroContainer = ({
               height="34px"
               width='10vw'
               borderRadius="40px"
-              data-testid='RegisterButton'
+              data-testid='LogoutButton'
               onClick={() => {
                 dispatchUpdate({
                   action: 'logout',
