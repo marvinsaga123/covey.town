@@ -56,8 +56,8 @@ The previous implementation of the `RoomsService` from the original repository w
 
 ### Frontend 
 
-[ WIP ] - Marvin will do
+A live deployment of our Frontend was accomplished using Netlify, with a new deployment performed every time a new commit is pushed to our `master` branch using GitHub Actions.
 
 ### Backend
 
-[ WIP ] - Marvin will do
+A live deployment of our Backend was accomplished using Heroku, with a new deployment performed every time a new commit is pushed to our `master` branch using GitHub Actions.
