@@ -13,8 +13,10 @@ import React, {
 import { BrowserRouter } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import './App.css';
+import FriendsServiceClient from './classes/FriendsServiceClient';
 import Player, { ServerPlayer, UserLocation } from './classes/Player';
 import TownsServiceClient, { TownJoinResponse } from './classes/TownsServiceClient';
+import UserServiceClient from './classes/UserServiceClient';
 import Video from './classes/Video/Video';
 import InitialLandingPage from './components/InitialLandingPage/InitialLandingPage';
 import Login from './components/Login/Login';
@@ -52,6 +54,8 @@ function defaultAppState(): CoveyAppState {
     },
     emitMovement: () => {},
     apiClient: new TownsServiceClient(),
+    userClient: new UserServiceClient(),
+    friendsClient: new FriendsServiceClient(),
     isLoggedIn: false,
     isRegistering: false,
   };
@@ -70,6 +74,8 @@ function appStateReducer(state: CoveyAppState, update: CoveyAppUpdate): CoveyApp
     socket: state.socket,
     emitMovement: state.emitMovement,
     apiClient: state.apiClient,
+    userClient: state.userClient,
+    friendsClient: state.friendsClient,
     isLoggedIn: state.isLoggedIn,
     isRegistering: state.isRegistering,
   };

@@ -31,11 +31,6 @@ import { makeStyles, Theme } from '@material-ui/core';
 import { IndeterminateCheckBoxOutlined, Search } from '@material-ui/icons';
 import { indexBy } from 'ramda';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
-import Video from '../../../../../../classes/Video/Video';
-
-// interface TownSelectionProps {
-//   doLogin: (initData: TownJoinResponse) => Promise<boolean>;
-// }
 
 export default function FriendsInfoButton(): JSX.Element {
   const [fetchedUsers, setFetchedUsers] = useState<Friend[]>([]);
@@ -44,7 +39,7 @@ export default function FriendsInfoButton(): JSX.Element {
   const [removedFriend, setRemovedFriend] = React.useState<number[]>([]);
   const [respondedRequest, setRespondedRequest] = React.useState<number[]>([]);
   const [cancelledRequest, setCancelledRequest] = React.useState<number[]>([]);
-  const {apiClient, userName, myPlayerID} = useCoveyAppState();
+  const {userName, friendsClient} = useCoveyAppState();
   const toast = useToast()
 
   const handleOpen = () => {
@@ -68,7 +63,7 @@ export default function FriendsInfoButton(): JSX.Element {
     setRespondedRequest([]);
     try {
       if (menu === 'friendsList') {
-        await apiClient
+        await friendsClient
         .processFriendsListAction({ action: 'getCurrentListOfFriends', forUser: userName })
         .then(res => {
           if (res.listOfUsers) {
@@ -85,7 +80,7 @@ export default function FriendsInfoButton(): JSX.Element {
           });
       }
       if (menu === 'pending') {
-        await apiClient
+        await friendsClient
         .processFriendsListAction({ action: 'getPendingFriendRequests', forUser: userName })
         .then(res => {
           if (res.listOfUsers) {
@@ -113,7 +108,7 @@ export default function FriendsInfoButton(): JSX.Element {
 
   const handleRemoveFriend = async (friend: string, index: number) => {
     try {
-        await apiClient
+        await friendsClient
         .removeFriend({ friend: friend, user: userName })
         .then(res => {
           //remove friend buttons
@@ -134,7 +129,7 @@ export default function FriendsInfoButton(): JSX.Element {
 
   const handleFriendRequest = async (sender: string, recipient: string, index: number, action: string) => {
     try {
-        await apiClient
+        await friendsClient
         .processFriendRequestAction({ action: action, friendRequestSender: sender, friendRequestRecipient: recipient })
         .then(res => {
           if (res.requestSentSuccess) {
@@ -162,7 +157,7 @@ export default function FriendsInfoButton(): JSX.Element {
 
   const handleCancelRequest = async (sender: string, recipient: string, index: number) => {
     try {
-        await apiClient
+        await friendsClient
         .cancelFriendRequest({action: 'cancel', friendRequestSender: sender, friendRequestRecipient: recipient })
         .then(res => {
           if (res.requestSentSuccess) {
@@ -188,34 +183,6 @@ export default function FriendsInfoButton(): JSX.Element {
       return;
     }
   };
-  // const handleJoin = useCallback(
-  //   async (coveyRoomID: string) => {
-  //     try {
-  //       if (!coveyRoomID || coveyRoomID.length === 0) {
-  //         toast({
-  //           title: 'Unable to join town',
-  //           description: 'Please enter a town ID',
-  //           status: 'error',
-  //         });
-  //         return;
-  //       }
-  //       const initData = await Video.setup(userName, coveyRoomID);
-
-  //       const loggedIn = await doLogin(initData);
-  //       if (loggedIn) {
-  //         assert(initData.providerVideoToken);
-  //         await connect(initData.providerVideoToken);
-  //       }
-  //     } catch (err) {
-  //       toast({
-  //         title: 'Unable to connect to Towns Service',
-  //         description: err.toString(),
-  //         status: 'error',
-  //       });
-  //     }
-  //   },
-  //   [doLogin, userName, connect, toast],
-  // );
 
   return (
       <Button onClick={handleOpen} 
@@ -257,9 +224,16 @@ export default function FriendsInfoButton(): JSX.Element {
                                     <Typography component="h2">
                                     {user.username}
                                   </Typography>
-                                  <Typography component="h2">
-                                  Friend Removed!
-                                </Typography>
+                                  <ListItemSecondaryAction>
+                                  <Button disabled edge="end"
+                                                 colorScheme='red'
+                                                 color='white'
+                                                 height="34px"
+                                                 borderRadius="40px"
+                                                 key={index}>
+                                              Friend Removed!
+                                            </Button>
+                                            </ListItemSecondaryAction>
                                 </ListItem>
                                 )
                               } else if (user.room) {
@@ -326,10 +300,16 @@ export default function FriendsInfoButton(): JSX.Element {
                                   <Typography component="h2">
                                   {user.username}
                                 </Typography>
-                                &nbsp;&nbsp;
-                                <Typography component="h2">
-                                Friend Removed!
-                              </Typography>
+                                <ListItemSecondaryAction>
+                                <Button disabled edge="end"
+                                                 colorScheme='red'
+                                                 color='white'
+                                                 height="34px"
+                                                 borderRadius="40px"
+                                                 key={index}>
+                                              Friend Removed!
+                                            </Button>
+                                            </ListItemSecondaryAction>
                               </ListItem>
                               )
                             } else {
@@ -346,7 +326,6 @@ export default function FriendsInfoButton(): JSX.Element {
                                                        colorScheme='red'
                                                        color='white'
                                                        height="34px"
-                                                       width='10vw'
                                                        borderRadius="40px"
                                                        onClick={() => handleRemoveFriend(user.username, index)}>
                                               Remove Friend
@@ -370,9 +349,16 @@ export default function FriendsInfoButton(): JSX.Element {
                                     <Typography component="h2">
                                     {user.username}
                                   </Typography>
-                                  <Typography component="h2">
-                                  Confirmed!
-                                </Typography>
+                                  <ListItemSecondaryAction>
+                                  <Button disabled edge="end"
+                                                 colorScheme='red'
+                                                 color='white'
+                                                 height="34px"
+                                                 borderRadius="40px"
+                                                 key={index}>
+                                              Confirmed!
+                                            </Button>
+                                            </ListItemSecondaryAction>
                                 </ListItem>
                                 )
                               } else {
@@ -413,9 +399,17 @@ export default function FriendsInfoButton(): JSX.Element {
                                     <Typography component="h2">
                                     {user.username}
                                   </Typography>
-                                  <Typography component="h2">
-                                  Friend Request Cancelled!
-                                </Typography>
+                                  <ListItemSecondaryAction>
+                                  <Button disabled
+                                                 colorScheme='red'
+                                                 color='white'
+                                                 height="34px"
+                                                 borderRadius="40px"
+                                                 key={index}>
+                                              Friend Request Cancelled!
+                                            </Button>
+                                            </ListItemSecondaryAction>
+
                                 </ListItem>
                                 )
                               } else {

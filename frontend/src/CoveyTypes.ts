@@ -1,6 +1,9 @@
 import { Socket } from 'socket.io-client';
 import Player, { UserLocation } from './classes/Player';
 import TownsServiceClient from './classes/TownsServiceClient';
+import UserServiceClient from './classes/UserServiceClient';
+import FriendsServiceClient from './classes/FriendsServiceClient';
+
 
 export type CoveyEvent = 'playerMoved' | 'playerAdded' | 'playerRemoved';
 
@@ -31,6 +34,8 @@ export type CoveyAppState = {
   emitMovement: (location: UserLocation) => void;
   socket: Socket | null;
   apiClient: TownsServiceClient;
+  userClient: UserServiceClient;
+  friendsClient: FriendsServiceClient;
   isLoggedIn: boolean;
   isRegistering: boolean;
 };

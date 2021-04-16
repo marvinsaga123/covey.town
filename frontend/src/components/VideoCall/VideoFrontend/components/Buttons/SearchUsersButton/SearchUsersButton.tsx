@@ -34,7 +34,7 @@ export default function SearchUsersButton(): JSX.Element {
   const [fetchedUsers, setFetchedUsers] = useState<Friendship[]>([]);
   const [open, setOpen] = React.useState(false);
   const [pressed, setPressed] = React.useState<number[]>([]);
-  const {apiClient, userName} = useCoveyAppState();
+  const {friendsClient, userClient, userName} = useCoveyAppState();
   const toast = useToast()
 
 
@@ -54,7 +54,7 @@ export default function SearchUsersButton(): JSX.Element {
 
     if (name.length > 0) {
       try {
-        await apiClient
+        await userClient
         .searchUsers({ userName: name, currUser: userName })
         .then(res => {
           if (res.listOfUsers.length > 0) {
@@ -76,7 +76,7 @@ export default function SearchUsersButton(): JSX.Element {
 
   const handleAddFriend = async (name: string, index: number) => {
       try {
-        await apiClient
+        await friendsClient
         .addFriend({ sender: userName, recipient: name })
         .then(res => {
           if (res.requestSentSuccess) {
@@ -149,9 +149,16 @@ export default function SearchUsersButton(): JSX.Element {
                                     <Typography component="h1">
                                       {user.username}
                                     </Typography>
-                                  <Typography component="h2">
-                                    Friend Request Sent!
-                                  </Typography>
+                                    <ListItemSecondaryAction>
+                                  <Button disabled
+                                                 colorScheme='purple'
+                                                 color='white'
+                                                 height="34px"
+                                                 borderRadius="40px"
+                                                 key={index}>
+                                              Friend Request Sent!
+                                            </Button>
+                                            </ListItemSecondaryAction>
                                 </ListItem>
                                 )
                               } else {
