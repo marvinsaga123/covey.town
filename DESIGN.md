@@ -8,7 +8,7 @@
 
 - The `FriendsService` takes care of managing friend request instead of the `UserService`
 - The `UserService` takes care of searching for users instead of the `FriendsService`
-- Clarification to "view the list of usernames of users in a room" (Frontend portion): should be "view the list of usernames of users currently in video chat" (this is what User Story #2 wass specifically aiming for)
+- Clarification to "view the list of usernames of users in a room" (Frontend portion): should be "view the list of usernames of users currently in video chat" (this is what User Story #2 was specifically aiming for)
 
 ## App State
 
