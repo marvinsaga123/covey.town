@@ -45,6 +45,17 @@ The previous implementation of the `RoomsService` from the original repository w
 
 ## Fronted Updates
 
+In addition to app state and backend services additions, a number of Frontend updates were performed as well. The Frontend updates performed as part of this final project include:
+
+- Login and registration user interface implementations
+- Initial landing page (town selection) was updated to match the new purple color scheme
+- All text inputs integrate the purple color scheme when focused
+- Username and logout button are noew rendered at the top of the town selection page
+- A list showing the current users in the video chat is rendered on the right side of the world map page
+- The menu bar at the bottom of the world map page was updated to match the new purple color scheme
+- This menu bar also now displays the currently logged in user's username
+- This menu bar also displays a logout button and a revamped disconnect button
+
 ## Database
 
 ### Architecture
