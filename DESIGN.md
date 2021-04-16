@@ -28,7 +28,7 @@ The previous implementation of the `RoomsService` from the original repository w
 
 ### `UserService`
 
-`UserService`'s architecture was inspired by the architecture used for `RoomsService`, and it follows the same logical pattern. For user-centered operations, the frontend would use the `userClient` from the app's current `CoveyAppState`. This would make a call to the `UserServiceClient`, which then made a request routed through the `user.ts` file under our `router` folder in the services directory. From here, requests are handled by the same request handler file (`CoveyTownRequestHandlers.ts`) as that for the `RoomsService` API client, and operations to the database and subsequent responses are returned here as well.
+`UserService`'s architecture was inspired by the architecture used for `RoomsService`, and it follows the same logical pattern. For user-centered operations, the frontend would use the `userClient` from the app's current `CoveyAppState`. This would make a call to the `UserServiceClient`, which then makes a request routed through the `user.ts` file under our `router` folder in the services directory. From here, requests are handled by the same request handler file (`CoveyTownRequestHandlers.ts`) as that for the `RoomsService` client. Operations to the database and subsequent responses are performed / returned from here as well.
 
 #### New Features Handled by `UserService`
 
@@ -41,7 +41,7 @@ The previous implementation of the `RoomsService` from the original repository w
 
 ### `FriendsService`
 
-`FriendsService`'s architecture was inspired by the architecture used for `RoomsService`, and it follows the same logical pattern. For friends-centered operations, the frontend would use the `friendsClient` from the app's current `CoveyAppState`. This would make a call to the `FriendsServiceClient`, which then made a request routed through the `friends.ts` file under our `router` folder in the services directory. From here, requests are handled by the same request handler file (`CoveyTownRequestHandlers.ts`) as that for the `RoomsService` API client, and operations to the database and subsequent responses are returned from here as well.
+`FriendsService`'s architecture was inspired by the architecture used for `RoomsService`, and it follows the same logical pattern. For friends-centered operations, the frontend would use the `friendsClient` from the app's current `CoveyAppState`. This would make a call to the `FriendsServiceClient`, which then makes a request routed through the `friends.ts` file under our `router` folder in the services directory. From here, requests are handled by the same request handler file (`CoveyTownRequestHandlers.ts`) as that for the `RoomsService` client. Operations to the database and subsequent responses are performed / returned from here as well.
 
 #### New Features Handled by `FriendsService`
 
