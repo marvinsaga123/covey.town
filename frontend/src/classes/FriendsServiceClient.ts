@@ -123,7 +123,7 @@ export default class FriendsServiceClient {
   }
 
   // accepting or denying a friend quest
-  async processFriendRequestAction(requestData: FriendRequest): Promise<void> {
+  async processIncomingFriendRequestAction(requestData: FriendRequest): Promise<void> {
     let responseWrapper: AxiosResponse<ResponseEnvelope<void>>;
 
     if (requestData.action === 'accept') {
@@ -160,9 +160,18 @@ export default class FriendsServiceClient {
   }
 
   // send a friend request to a user
-  async addFriend(requestData: AddFriendRequest): Promise<AddFriendResponse> {
+  async sendOutgoingFriendRequest(requestData: AddFriendRequest): Promise<AddFriendResponse> {
     const responseWrapper = await this._axios.post<ResponseEnvelope<AddFriendResponse>>(
-      '/addFriend',
+      '/sendOutgoingFriendRequest',
+      requestData,
+    );
+    return FriendsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  // cancel a friend request to a user
+  async cancelOutgoingFriendRequest(requestData: FriendRequest): Promise<RemoveFriendResponse> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<RemoveFriendResponse>>(
+      '/cancelFriendRequest',
       requestData,
     );
     return FriendsServiceClient.unwrapOrThrowError(responseWrapper);
@@ -172,15 +181,6 @@ export default class FriendsServiceClient {
   async removeFriend(requestData: RemoveFriendRequest): Promise<RemoveFriendResponse> {
     const responseWrapper = await this._axios.post<ResponseEnvelope<RemoveFriendResponse>>(
       '/removeFriend',
-      requestData,
-    );
-    return FriendsServiceClient.unwrapOrThrowError(responseWrapper);
-  }
-
-  // cancel a friend request to a user
-  async cancelFriendRequest(requestData: FriendRequest): Promise<RemoveFriendResponse> {
-    const responseWrapper = await this._axios.post<ResponseEnvelope<RemoveFriendResponse>>(
-      '/cancelFriendRequest',
       requestData,
     );
     return FriendsServiceClient.unwrapOrThrowError(responseWrapper);

@@ -43,6 +43,7 @@ export default function FriendsInfoButton(): JSX.Element {
     setRemovedFriend([]);
     setCancelledRequest([]);
     setRespondedRequest([]);
+
     try {
       if (menu === 'friendsList') {
         await friendsClient
@@ -52,8 +53,8 @@ export default function FriendsInfoButton(): JSX.Element {
               setFetchedUsers(res.listOfUsers);
             } else {
               toast({
-                title: 'Unable to complete request',
-                description: 'Error',
+                title: 'Error',
+                description: 'Unable to fetch list of users, please try again.',
                 status: 'error',
               });
             }
@@ -70,8 +71,8 @@ export default function FriendsInfoButton(): JSX.Element {
               setFetchedUsers(res.listOfUsers);
             } else {
               toast({
-                title: 'Unable to complete request',
-                description: 'Error',
+                title: 'Error',
+                description: 'Unable to fetch list of pending friend requests, please try again.',
                 status: 'error',
               });
             }
@@ -82,7 +83,6 @@ export default function FriendsInfoButton(): JSX.Element {
       }
     } catch (err) {
       toast({
-        title: 'Unable to complete search',
         description: err.toString(),
         status: 'error',
       });
@@ -93,16 +93,23 @@ export default function FriendsInfoButton(): JSX.Element {
     try {
       await friendsClient
         .removeFriend({ friend, user: userName })
-        .then(() => {
-          // remove friend buttons
-          setRemovedFriend(prev => [...prev, index]);
+        .then(res => {
+          if (res.requestSentSuccess) {
+            // remove friend buttons
+            setRemovedFriend(prev => [...prev, index]);
+          } else {
+            toast({
+              title: 'Error',
+              description: 'Unable to remove friend, please try again.',
+              status: 'error',
+            });
+          }
         })
         .catch(err => {
           throw err;
         });
     } catch (err) {
       toast({
-        title: 'Unable to complete search',
         description: err.toString(),
         status: 'error',
       });
@@ -117,7 +124,7 @@ export default function FriendsInfoButton(): JSX.Element {
   ) => {
     try {
       await friendsClient
-        .processFriendRequestAction({
+        .processIncomingFriendRequestAction({
           action,
           friendRequestSender: sender,
           friendRequestRecipient: recipient,
@@ -128,14 +135,13 @@ export default function FriendsInfoButton(): JSX.Element {
         })
         .catch(() => {
           toast({
-            title: 'Unable to complete request',
-            description: 'Error',
+            title: 'Error',
+            description: 'Unable to accept or deny friend request, please try again.',
             status: 'error',
           });
         });
     } catch (err) {
       toast({
-        title: 'Unable to complete search',
         description: err.toString(),
         status: 'error',
       });
@@ -145,7 +151,7 @@ export default function FriendsInfoButton(): JSX.Element {
   const handleCancelRequest = async (sender: string, recipient: string, index: number) => {
     try {
       await friendsClient
-        .cancelFriendRequest({
+        .cancelOutgoingFriendRequest({
           action: 'cancel',
           friendRequestSender: sender,
           friendRequestRecipient: recipient,
@@ -156,8 +162,8 @@ export default function FriendsInfoButton(): JSX.Element {
             setCancelledRequest(prev => [...prev, index]);
           } else {
             toast({
-              title: 'Unable to complete request',
-              description: 'Error',
+              title: 'Error',
+              description: 'Unable to cancel outgoing friend request, please try again.',
               status: 'error',
             });
           }
@@ -167,7 +173,6 @@ export default function FriendsInfoButton(): JSX.Element {
         });
     } catch (err) {
       toast({
-        title: 'Unable to complete search',
         description: err.toString(),
         status: 'error',
       });
@@ -404,7 +409,7 @@ export default function FriendsInfoButton(): JSX.Element {
                                 user.requestSender,
                                 user.requestRecipient,
                                 index,
-                                'accept',
+                                'deny',
                               )
                             }>
                             Deny

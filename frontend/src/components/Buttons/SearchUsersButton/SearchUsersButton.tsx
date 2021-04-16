@@ -49,7 +49,6 @@ export default function SearchUsersButton(): JSX.Element {
           });
       } catch (err) {
         toast({
-          title: 'Unable to complete search',
           description: err.toString(),
           status: 'error',
         });
@@ -60,15 +59,15 @@ export default function SearchUsersButton(): JSX.Element {
   const handleAddFriend = async (name: string, index: number) => {
     try {
       await friendsClient
-        .addFriend({ sender: userName, recipient: name })
+        .sendOutgoingFriendRequest({ sender: userName, recipient: name })
         .then(res => {
           if (res.requestSentSuccess) {
             // disable button after friend request has been sent
             setPressed(prev => [...prev, index]);
           } else {
             toast({
-              title: 'Unable to complete request',
-              description: 'Error',
+              title: 'Error',
+              description: 'Unable to send friend request, please try again.',
               status: 'error',
             });
           }
@@ -78,7 +77,6 @@ export default function SearchUsersButton(): JSX.Element {
         });
     } catch (err) {
       toast({
-        title: 'Unable to complete request',
         description: err.toString(),
         status: 'error',
       });

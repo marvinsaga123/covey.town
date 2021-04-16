@@ -5,11 +5,11 @@ import { StatusCodes } from 'http-status-codes';
 import io from 'socket.io';
 import {
   acceptFriendRequestHandler,
+  cancelFriendRequestHandler,
   denyFriendRequestHandler,
-  performAddFriendAction,
-  performCancelFriendRequest,
-  performFriendRemovalAction,
-  performFriendsListAction,
+  performFriendsListActionHandler,
+  removeFriendHandler,
+  sendFriendRequestHandler,
   townSubscriptionHandler,
 } from '../requestHandlers/CoveyTownRequestHandlers';
 import { logError } from '../Utils';
@@ -58,10 +58,29 @@ export default function addFriendsRoutes(http: Server, app: Express): io.Server 
    */
   app.post('/removeFriend', BodyParser.json(), async (req, res) => {
     try {
-      const result = await performFriendRemovalAction({
+      const result = await removeFriendHandler({
         friend: req.body.friend,
         user: req.body.user,
       });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  /**
+   * Send a friend request
+   */
+  app.post('/sendOutgoingFriendRequest', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await sendFriendRequestHandler({
+        sender: req.body.sender,
+        recipient: req.body.recipient,
+      });
+
       res.status(StatusCodes.OK).json(result);
     } catch (err) {
       logError(err);
@@ -76,7 +95,7 @@ export default function addFriendsRoutes(http: Server, app: Express): io.Server 
    */
   app.post('/cancelFriendRequest', BodyParser.json(), async (req, res) => {
     try {
-      const result = await performCancelFriendRequest({
+      const result = await cancelFriendRequestHandler({
         action: 'cancel',
         friendRequestSender: req.body.friendRequestSender,
         friendRequestRecipient: req.body.friendRequestRecipient,
@@ -95,7 +114,7 @@ export default function addFriendsRoutes(http: Server, app: Express): io.Server 
    */
   app.get('/pendingFriendRequests/:forUser', BodyParser.json(), async (req, res) => {
     try {
-      const result = await performFriendsListAction({
+      const result = await performFriendsListActionHandler({
         action: {
           actionName: 'getPendingFriendRequests',
           errorMessage: 'Error occurred while getting pending friend requests. Please try again.',
@@ -116,7 +135,7 @@ export default function addFriendsRoutes(http: Server, app: Express): io.Server 
    */
   app.get('/listOfFriends/:forUser', BodyParser.json(), async (req, res) => {
     try {
-      const result = await performFriendsListAction({
+      const result = await performFriendsListActionHandler({
         action: {
           actionName: 'getCurrentListOfFriends',
           errorMessage: 'Error occurred while getting current list of friends. Please try again.',
@@ -125,25 +144,6 @@ export default function addFriendsRoutes(http: Server, app: Express): io.Server 
       });
       res.status(StatusCodes.OK).json(result);
     } catch (err) {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        message: 'Internal server error, please see log in server for more details',
-      });
-    }
-  });
-
-  /**
-   * Accept a friend request
-   */
-  app.post('/addFriend', BodyParser.json(), async (req, res) => {
-    try {
-      const result = await performAddFriendAction({
-        sender: req.body.sender,
-        recipient: req.body.recipient,
-      });
-
-      res.status(StatusCodes.OK).json(result);
-    } catch (err) {
-      logError(err);
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         message: 'Internal server error, please see log in server for more details',
       });

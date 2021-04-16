@@ -347,7 +347,7 @@ export async function denyFriendRequestHandler(
   };
 }
 
-export async function performFriendsListAction(
+export async function performFriendsListActionHandler(
   requestData: FriendsListActionRequest,
 ): Promise<ResponseEnvelope<FriendsListActionResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
@@ -414,7 +414,7 @@ export async function performUserSearchAction(
   };
 }
 
-export async function performAddFriendAction(
+export async function sendFriendRequestHandler(
   requestData: AddFriendRequest,
 ): Promise<ResponseEnvelope<AddFriendResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
@@ -430,7 +430,7 @@ export async function performAddFriendAction(
   };
 }
 
-export async function performFriendRemovalAction(
+export async function removeFriendHandler(
   requestData: RemoveFriendRequest,
 ): Promise<ResponseEnvelope<RemoveFriendResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
@@ -446,7 +446,7 @@ export async function performFriendRemovalAction(
   };
 }
 
-export async function performCancelFriendRequest(
+export async function cancelFriendRequestHandler(
   requestData: FriendRequest,
 ): Promise<ResponseEnvelope<RemoveFriendResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
