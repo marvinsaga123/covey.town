@@ -33,6 +33,7 @@ The previous implementation of the `RoomsService` from the original repository w
 - Registering an account in Covey.Town
 - Logging in to Covey.Town
 - Logging out of Covey.Town
+- Manage friend requests
 
 ### `FriendsService`
 
