@@ -26,7 +26,7 @@ The previous implementation of the `RoomsService` from the original repository w
 
 #### New Features Handled by `UserService`
 
-**Note:** our login, logout and registration system is a barebones system that does not employ authentication, and authentication was never a part of the user stories to implement these feature. However, were we to release this to the public, we would ideally integrate an authentication service to make our login, logout and registration systems more robust.
+**Note:** our login, logout and registration system is a barebones system that does not employ authentication / new page re-direction, and authentication / page re-direction was never a part of the user stories to implement these feature. However, were we to release this to the public, we would ideally integrate an authentication service to make our login, logout and registration systems more robust.
 
 - Registering an account in Covey.Town
 - Logging in to Covey.Town
