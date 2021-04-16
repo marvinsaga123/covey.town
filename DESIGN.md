@@ -20,7 +20,7 @@ Two new properties were added to the `CoveyAppState` type: a `friendsClient` and
 
 ### `RoomsService`
 
-The previous implementation of the `RoomsService` from the original repository was essentially kept intact, with some additions of new routes involved with newly added features dealing with rooms.
+The previous implementation of the `RoomsService` from the original repository was essentially kept intact, with new features re-using routes that had already been implemented.
 
 #### New Features Handled by `RoomsService`
 
