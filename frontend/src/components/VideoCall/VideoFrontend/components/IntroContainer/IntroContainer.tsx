@@ -1,8 +1,11 @@
-import { Button, HStack } from '@chakra-ui/react';
+import { Button, HStack, StackDivider, VStack } from '@chakra-ui/react';
 import { makeStyles, Theme } from '@material-ui/core';
+import { Search } from '@material-ui/icons';
 import React from 'react';
 import { CoveyAppUpdate } from '../../../../../CoveyTypes';
 import useCoveyAppState from '../../../../../hooks/useCoveyAppState';
+import FriendsInfoButton from '../Buttons/FriendsInfoButton/FriendsInfoButton';
+import SearchUsersButton from '../Buttons/SearchUsersButton/SearchUsersButton';
 
 const useStyles = makeStyles((theme: Theme) => ({
   background: {
@@ -57,8 +60,7 @@ const IntroContainer = ({
     <div className={classes.background}>
       <div className={classes.container}>
         <div className={classes.innerContainer}>
-          <HStack
-            borderBottomWidth='1px'
+          <HStack borderBottomWidth='1px'
             borderBottomColor='#5F2EEA'
             justify='space-between'
             paddingRight='2em'
@@ -66,14 +68,16 @@ const IntroContainer = ({
             paddingTop='0.5em'
             paddingBottom='0.5em'
             marginBottom={3}>
+          <VStack>
             <p>
               Logged in as <b>{appStateUserName}</b>
             </p>
             <Button
               backgroundColor='#5F2EEA'
               color='white'
-              as='kbd'
+              height="34px"
               width='10vw'
+              borderRadius="40px"
               data-testid='RegisterButton'
               onClick={() => {
                 dispatchUpdate({
@@ -86,7 +90,13 @@ const IntroContainer = ({
               }}>
               Logout
             </Button>
+            </VStack>
+            <VStack spacing={2}>   
+              <SearchUsersButton></SearchUsersButton>
+              <FriendsInfoButton></FriendsInfoButton>
+            </VStack>            
           </HStack>
+
           <div className={classes.content}>{children}</div>
         </div>
         {subContent && <div className={classes.subContentContainer}>{subContent}</div>}

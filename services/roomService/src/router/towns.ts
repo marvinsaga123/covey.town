@@ -8,12 +8,16 @@ import {
   denyFriendRequestHandler,
   loginHandler,
   performFriendsListAction,
+  performUserSearchAction,
+  performAddFriendAction,
   townCreateHandler,
   townDeleteHandler,
   townJoinHandler,
   townListHandler,
   townSubscriptionHandler,
   townUpdateHandler,
+  performFriendRemovalAction,
+  performCancelFriendRequest
 } from '../requestHandlers/CoveyTownRequestHandlers';
 import { logError } from '../Utils';
 
@@ -92,6 +96,39 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
     }
   });
 
+    /**
+   * Remove a Friend
+   */
+  app.post('/removeFriend', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await performFriendRemovalAction({
+        friend: req.body.friend,
+        user: req.body.user
+      });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  app.post('/cancelFriendRequest', BodyParser.json(), async (req, res) => {
+    try {
+      const result = await performCancelFriendRequest({
+          action: 'cancel',
+          friendRequestSender: req.body.friendRequestSender,
+          friendRequestRecipient: req.body.friendRequestRecipient,
+        });
+        res.status(StatusCodes.OK).json(result);
+      } catch (err) {
+        logError(err);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+          message: 'Internal server error, please see log in server for more details',
+        });
+      }
+    });
   /**
    * Get the pending friend requests for a user
    */
@@ -125,6 +162,40 @@ export default function addTownRoutes(http: Server, app: Express): io.Server {
         },
         forUser: req.params.forUser,
       });
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      console.log(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  app.get('/searchUsers/:currUser/:userName', BodyParser.json(), async (req, res) => {
+    console.log("in towns")
+    try {
+      const result = await performUserSearchAction({
+        userName: req.params.userName,
+        currUser: req.params.currUser
+      });
+
+      res.status(StatusCodes.OK).json(result);
+    } catch (err) {
+      logError(err);
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        message: 'Internal server error, please see log in server for more details',
+      });
+    }
+  });
+
+  app.post('/addFriend', BodyParser.json(), async (req, res) => {
+    try {
+
+      const result = await performAddFriendAction({
+        sender: req.body.sender,
+        recipient: req.body.recipient
+      });
+
       res.status(StatusCodes.OK).json(result);
     } catch (err) {
       logError(err);
