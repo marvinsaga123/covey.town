@@ -43,6 +43,8 @@ The previous implementation of the `RoomsService` from the original repository w
 - View one's current friends list
 - View the rooms friends are currently in if the Covey.Town room is public
 
+## Fronted Updates
+
 ## Database
 
 ### Architecture
