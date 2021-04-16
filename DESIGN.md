@@ -39,9 +39,9 @@ The previous implementation of the `RoomsService` from the original repository w
 
 #### New Features Handled by `FriendsService`
 
-- WIP
-- WIP
-- WIP
+- Search by users by username
+- View one's current friends list
+- View the rooms friends are currently in if the Covey.Town room is public
 
 ## Database
 
