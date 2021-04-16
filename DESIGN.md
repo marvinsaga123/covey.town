@@ -46,9 +46,11 @@ The previous implementation of the `RoomsService` from the original repository w
 
 ### Architecture
 
-[ WIP ]
+[ WIP ] - Rachel
 
 ### Communication with Backend
+
+[ WIP ] - Rachel
 
 ## Live Deployement
 
