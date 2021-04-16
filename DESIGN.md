@@ -2,7 +2,7 @@
 
 ## High Level Architecture
 
-![High Level Architecture Diagram](https://ibb.co/449QMFQ)
+![High Level Architecture Diagram](High-Level-Architecture.png)
 
 ## `RoomService`
 
