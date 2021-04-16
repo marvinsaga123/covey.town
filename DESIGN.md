@@ -44,6 +44,18 @@ The previous implementation of the `RoomsService` from the original repository w
 
 ## Database
 
-### General Overview
+### Architecture
 
 [ WIP ]
+
+### Communication with Backend
+
+## Live Deployement
+
+### Frontend 
+
+[ WIP ] - Marvin will do
+
+### Backend
+
+[ WIP ] - Marvin will do
