@@ -7,6 +7,7 @@
 **Architecture Updates as of 4/16:**
 
 - The `FriendsService` takes care of managing friend request instead of the `UserService`
+- The `UserService` takes care of searching for users instead of the `FriendsService`
 
 ## App State
 
