@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import Player, { UserLocation } from '../../classes/Player';
 import Video from '../../classes/Video/Video';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
+import SearchUsersButton from '../VideoCall/VideoFrontend/components/Buttons/SearchUsersButton/SearchUsersButton';
+import FriendsInfoButton from '../VideoCall/VideoFrontend/components/Buttons/FriendsInfoButton/FriendsInfoButton';
 
 // https://medium.com/@michaelwesthadley/modular-game-worlds-in-phaser-3-tilemaps-1-958fc7e6bbd6
 class CoveyGameScene extends Phaser.Scene {
@@ -475,5 +477,8 @@ export default function WorldMap(): JSX.Element {
     gameScene?.updatePlayersLocations(players);
   }, [players, deepPlayers, gameScene]);
 
-  return <div id='map-container' />;
+  return <div id='map-container'>
+          <SearchUsersButton/>
+          <FriendsInfoButton/>
+    </div>;
 }

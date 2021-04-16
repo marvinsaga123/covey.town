@@ -3,13 +3,17 @@ import Express from 'express';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import CoveyTownsStore from './lib/CoveyTownsStore';
+import addFriendsRoutes from './router/friends';
 import addTownRoutes from './router/towns';
+import addUserRoutes from './router/users';
 
 const app = Express();
 app.use(CORS());
 const server = http.createServer(app);
 
 addTownRoutes(server, app);
+addFriendsRoutes(server, app);
+addUserRoutes(server, app);
 
 server.listen(process.env.PORT || 8081, () => {
   const address = server.address() as AddressInfo;

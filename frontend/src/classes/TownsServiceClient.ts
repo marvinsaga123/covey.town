@@ -4,6 +4,14 @@ import { ServerPlayer } from './Player';
 
 type FriendsListActionName = 'getPendingFriendRequests' | 'getCurrentListOfFriends';
 
+export type Friend = {
+  username: string;
+  online: boolean;
+  room: string;
+  requestSender: string;
+  requestRecipient: string;
+};
+
 /**
  * The format of a request to register an account in Covey.town, as dispatched by the server middleware
  */
@@ -42,17 +50,14 @@ export interface FriendsListActionRequest {
  */
 export interface FriendsListActionResponse {
   /** the list of users returned for the friends list action */
-  listOfUsers: string[];
+  listOfUsers: Friend[];
 }
-
-type FriendRequestAction = 'accept' | 'deny';
-
 /**
  * The format of a request to accept or deny a friend request, as dispatched by server middleware
  */
 export interface FriendRequest {
   /** is the recipient accepting or denying the friend request? */
-  action: FriendRequestAction;
+  action: string;
   /** username of the player who sent the friend request */
   friendRequestSender: string;
   /** username of the player who received and is accepting the friend request */
@@ -76,6 +81,43 @@ export interface LoginRequest {
 export interface LoginResponse {
   /** Does a user exist with the sent userName and passord? */
   loggedInSuccessfully: boolean;
+}
+export interface SearchUsersRequest {
+  /** userName to be searched for */
+  userName: string;
+  currUser: string;
+}
+
+export type Friendship = {
+  username: string;
+  friendship: boolean;
+};
+
+export interface SearchUsersResponse {
+  /** Does a user exist that matches the given username? */
+  listOfUsers: Friendship[];
+}
+
+export interface AddFriendRequest {
+  /** userName to be searched for */
+  recipient: string;
+  sender: string;
+}
+
+export interface AddFriendResponse {
+  /** Does a user exist that matches the given username? */
+  requestSentSuccess: boolean;
+}
+
+export interface RemoveFriendRequest {
+  /** userName to be searched for */
+  friend: string;
+  user: string;
+}
+
+export interface RemoveFriendResponse {
+  /** Does a user exist that matches the given username? */
+  requestSentSuccess: boolean;
 }
 
 /**
@@ -225,12 +267,12 @@ export default class TownsServiceClient {
     let responseWrapper: AxiosResponse<ResponseEnvelope<void>>;
 
     if (requestData.action === 'accept') {
-      responseWrapper = await this._axios.post<ResponseEnvelope<void>>(
+      responseWrapper = await this._axios.post<ResponseEnvelope<AddFriendResponse>>(
         '/acceptFriendRequest',
         requestData,
       );
     } else {
-      responseWrapper = await this._axios.post<ResponseEnvelope<void>>(
+      responseWrapper = await this._axios.post<ResponseEnvelope<AddFriendResponse>>(
         '/denyFriendRequest',
         requestData,
       );
@@ -253,9 +295,33 @@ export default class TownsServiceClient {
         `/pendingFriendRequests/${requestData.forUser}`,
       );
     }
-
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
+
+  async searchUsers(requestData: SearchUsersRequest): Promise<SearchUsersResponse> {
+    const responseWrapper = await this._axios.get<ResponseEnvelope<SearchUsersResponse>>(
+      `/searchUsers/${requestData.currUser}/${requestData.userName}`);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async addFriend(requestData: AddFriendRequest): Promise<AddFriendResponse> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<AddFriendResponse>>(
+      '/addFriend', requestData);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async removeFriend(requestData: RemoveFriendRequest): Promise<RemoveFriendResponse> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<RemoveFriendResponse>>(
+      '/removeFriend', requestData);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
+  async cancelFriendRequest(requestData: FriendRequest): Promise<RemoveFriendResponse> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<RemoveFriendResponse>>(
+      '/cancelFriendRequest', requestData);
+    return TownsServiceClient.unwrapOrThrowError(responseWrapper);
+  }
+
 
   async updateTown(requestData: TownUpdateRequest): Promise<void> {
     const responseWrapper = await this._axios.patch<ResponseEnvelope<void>>(

@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { Socket } from 'socket.io';
-import { CoveyTownList, FriendsListAction, UserLocation } from '../CoveyTypes';
+import { CoveyTownList, Friend, Friendship, FriendsListAction, UserLocation } from '../CoveyTypes';
 import CoveyTownDatabase from '../lib/CoveyTownDatabase';
 import CoveyTownsStore from '../lib/CoveyTownsStore';
 import CoveyTownListener from '../types/CoveyTownListener';
@@ -44,17 +44,14 @@ export interface FriendsListActionRequest {
  */
 export interface FriendsListActionResponse {
   /** the list of users returned for the friends list action */
-  listOfUsers: string[];
+  listOfUsers: Friend[];
 }
-
-type FriendRequestAction = 'deny' | 'accept';
-
 /**
  * The format of a request to accept or deny a friend request, as dispatched by server middleware.
  */
 export interface FriendRequest {
   /** is the recipient accepting or denying the friend request? */
-  action: FriendRequestAction;
+  action: string;
   /** username of the player who sent the friend request */
   friendRequestSender: string;
   /** username of the player who received and is accepting the friend request */
@@ -78,6 +75,39 @@ export interface LoginRequest {
 export interface LoginResponse {
   /** Does a user exist with the sent userName and passord? */
   loggedInSuccessfully: boolean;
+}
+
+export interface SearchUsersRequest {
+  /** userName to be searched for */
+  userName: string;
+  currUser: string;
+}
+
+export interface SearchUsersResponse {
+  /** Does a user exist that matches the given username? */
+  listOfUsers: Friendship[];
+}
+
+export interface AddFriendRequest {
+  /** userName to be searched for */
+  recipient: string;
+  sender: string;
+}
+
+export interface AddFriendResponse {
+  /** Does a user exist that matches the given username? */
+  requestSentSuccess: boolean;
+}
+
+export interface RemoveFriendRequest {
+/** userName to be searched for */
+friend: string;
+user: string;
+}
+
+export interface RemoveFriendResponse {
+/** Does a user exist that matches the given username? */
+requestSentSuccess: boolean;
 }
 
 /**
@@ -247,7 +277,7 @@ export async function loginHandler(
 
 export async function acceptFriendRequestHandler(
   requestData: FriendRequest,
-): Promise<ResponseEnvelope<Record<string, null>>> {
+): Promise<ResponseEnvelope<AddFriendResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
 
   const success = await databaseInstance.processFriendRequestAction(
@@ -258,14 +288,14 @@ export async function acceptFriendRequestHandler(
 
   return {
     isOK: success,
-    response: {},
+    response: {requestSentSuccess: success},
     message: !success ? 'Accepting friend request failed, please try again.' : undefined,
   };
 }
 
 export async function denyFriendRequestHandler(
   requestData: FriendRequest,
-): Promise<ResponseEnvelope<Record<string, null>>> {
+): Promise<ResponseEnvelope<AddFriendResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
 
   const success = await databaseInstance.processFriendRequestAction(
@@ -276,7 +306,7 @@ export async function denyFriendRequestHandler(
 
   return {
     isOK: success,
-    response: {},
+    response: {requestSentSuccess: success},
     message: !success ? 'Denying friend request failed, please try again.' : undefined,
   };
 }
@@ -329,6 +359,67 @@ export async function registerHandler(
     response: {
       registerSuccessfully: true,
     },
+  };
+}
+
+export async function performUserSearchAction(
+  requestData: SearchUsersRequest,
+): Promise<ResponseEnvelope<SearchUsersResponse>> {
+  const databaseInstance = CoveyTownDatabase.getInstance();
+    console.log("in towns")
+
+  const userListResponseObject = await databaseInstance.searchUsers(
+    requestData.userName, requestData.currUser
+  );
+
+  return {
+    isOK: userListResponseObject.success,
+    response: { listOfUsers: userListResponseObject.listOfUsers }
+  };
+}
+
+export async function performAddFriendAction(
+  requestData: AddFriendRequest,
+): Promise<ResponseEnvelope<AddFriendResponse>> {
+  const databaseInstance = CoveyTownDatabase.getInstance();
+
+  const addFriendResponseObject = await databaseInstance.sendFriendRequest(
+    requestData.sender, requestData.recipient
+  );
+
+  return {
+    isOK: addFriendResponseObject,
+    response: {requestSentSuccess: addFriendResponseObject}
+  };
+}
+
+export async function performFriendRemovalAction(
+  requestData: RemoveFriendRequest,
+): Promise<ResponseEnvelope<RemoveFriendResponse>> {
+  const databaseInstance = CoveyTownDatabase.getInstance();
+
+  const responseObj = await databaseInstance.processFriendRemoveAction(
+    requestData.friend, requestData.user
+  );
+
+  return {
+    isOK: responseObj,
+    response: {requestSentSuccess: responseObj}
+  };
+}
+
+export async function performCancelFriendRequest(
+  requestData: FriendRequest,
+): Promise<ResponseEnvelope<RemoveFriendResponse>> {
+  const databaseInstance = CoveyTownDatabase.getInstance();
+
+  const responseObj = await databaseInstance.cancelFriendRequest(
+    requestData.friendRequestSender, requestData.friendRequestRecipient
+  );
+
+  return {
+    isOK: responseObj,
+    response: {requestSentSuccess: responseObj}
   };
 }
 

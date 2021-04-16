@@ -23,12 +23,37 @@ export type FriendsListAction = {
   errorMessage: string;
 };
 
-export type FriendsListDatabaseResponse = {
-  success: boolean;
-  response: string[];
+export type Friend = {
+  username: string;
+  online: boolean;
+  room: string;
+  requestSender: string;
+  requestRecipient: string;
 };
 
-export type RegisterDatabaseResponse = {
+export type FriendsListResponse = {
   success: boolean;
-  errorMessage?: string;
+  response: Friend[];
 };
+
+export type Friendship = {
+  username: string;
+  friendship: boolean;
+};
+
+export type SearchResponse = {
+  success: boolean;
+  /** Does a user exist that matches the given username? */
+  listOfUsers: Friendship[];
+}
+
+export interface SendFriendRequestAction {
+  /** userName to be searched for */
+  recipient: string;
+  sender: string;
+}
+
+export interface SendFriendRequestResponse {
+  /** Does a user exist that matches the given username? */
+  requestSentSuccess: boolean;
+}

@@ -8,6 +8,8 @@ import {
   denyFriendRequestHandler,
   loginHandler,
   performFriendsListAction,
+  performUserSearchAction,
+  performAddFriendAction,
   registerHandler,
   townCreateHandler,
   townDeleteHandler,
@@ -15,6 +17,8 @@ import {
   townListHandler,
   townSubscriptionHandler,
   townUpdateHandler,
+  performFriendRemovalAction,
+  performCancelFriendRequest
 } from '../requestHandlers/CoveyTownRequestHandlers';
 import { logError } from '../Utils';
 
