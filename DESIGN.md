@@ -10,7 +10,7 @@
 
 Two new properties were added to the `CoveyAppState` type: a `friendsAPIClient` and a `userAPIClient`, each of type `FriendsServiceClient` and `UserServiceClient`, respectively. In addition, the previous `apiClient` was renamed to `townsAPIClient` to reflect the more specific role it would be taking as part of the overall revamped app's architecture.
 
-## Services
+## Backend Services
 
 ### `RoomsService`
 
