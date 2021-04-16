@@ -33,7 +33,7 @@ export default function Login({ dispatchUpdate }: InitialLoginPageProps): JSX.El
     if (!userName || userName.length === 0) {
       toast({
         title: 'Username is Required',
-        description: 'Please enter your username',
+        description: 'Please enter your username.',
         status: 'error',
       });
 
@@ -43,7 +43,7 @@ export default function Login({ dispatchUpdate }: InitialLoginPageProps): JSX.El
     if (!userPassword || userPassword.length === 0) {
       toast({
         title: 'Password is Required',
-        description: 'Please enter your password',
+        description: 'Please enter your password.',
         status: 'error',
       });
 
@@ -64,7 +64,7 @@ export default function Login({ dispatchUpdate }: InitialLoginPageProps): JSX.El
             });
           } else {
             toast({
-              title: 'Unable to login',
+              title: 'Login Failed',
               description: 'Username and password combination is incorrect. Please try again.',
               status: 'error',
             });
@@ -75,7 +75,6 @@ export default function Login({ dispatchUpdate }: InitialLoginPageProps): JSX.El
         });
     } catch (err) {
       toast({
-        title: 'Unable to login',
         description: err.toString(),
         status: 'error',
       });
@@ -109,6 +108,7 @@ export default function Login({ dispatchUpdate }: InitialLoginPageProps): JSX.El
               placeholder='Username'
               value={userName}
               onChange={event => setUserName(event.target.value)}
+              focusBorderColor='#5F2EEA'
             />
           </FormControl>
         </HStack>
@@ -123,6 +123,7 @@ export default function Login({ dispatchUpdate }: InitialLoginPageProps): JSX.El
               placeholder='Password'
               value={userPassword}
               onChange={event => setUserPassword(event.target.value)}
+              focusBorderColor='#5F2EEA'
             />
           </FormControl>
           <Button onClick={handleShow}>{show ? 'Hide' : 'Show'}</Button>
@@ -133,7 +134,7 @@ export default function Login({ dispatchUpdate }: InitialLoginPageProps): JSX.El
           color='white'
           as='kbd'
           width='20vw'
-          data-testid='RegisterButton'
+          data-testid='LoginButton'
           onClick={() => handleLogin()}>
           Login
         </Button>

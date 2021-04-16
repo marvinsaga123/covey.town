@@ -11,12 +11,10 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
-import { ErrorTwoTone } from '@material-ui/icons';
 import React, { useState } from 'react';
 import { BiUser } from 'react-icons/bi';
 import { CoveyAppUpdate } from '../../CoveyTypes';
 import useCoveyAppState from '../../hooks/useCoveyAppState';
-
 
 interface InitialRegisterPageProps {
   dispatchUpdate: (update: CoveyAppUpdate) => void;
@@ -38,7 +36,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
       return false;
     }
     let capital = false;
-    let number = false; 
+    let number = false;
     let specialCharacter = false;
     for (let index = 0; index < userPassword.length; index += 1) {
       const num = userPassword.charAt(index);
@@ -66,8 +64,8 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
     try {
       if (!userId || !userPassword || !confirmPassword) {
         toast({
-          title: 'InfoNotFilled',
-          description: 'The username, password, and password confirmation need to be filled',
+          title: 'Required Fields Missing',
+          description: 'The username, password, and password confirmation need to be filled.',
           status: 'error',
           isClosable: true,
           duration: 3000,
@@ -77,58 +75,52 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
       const valid = await passwordIsValid();
       if (!valid) {
         toast({
-          title: 'Password Error',
+          title: 'Password Invalid',
           description:
-            'Password Invalid. there needs to be at least one capital letter,' +
-            'one number, and a special character(!@#$% etc...)' +
-            ' with minimum password length of 8',
+            'Password needs to have at least one capital letter, ' +
+            'one number, and a special character (!@#$% etc...) ' +
+            'with a minimum password length of 8.',
           status: 'error',
           isClosable: true,
-          duration: 3000,
+          duration: 6000,
         });
       } else if (userPassword !== confirmPassword) {
         toast({
-          title: 'PasswordConfirm Error',
-          description: 'Password Confirmation does not match the Password typed in, try again.',
+          title: 'Passwords Do Not Match',
+          description:
+            'Password confirmation does not match the original password typed in, please try again.',
           status: 'error',
           isClosable: true,
           duration: 3000,
         });
-      }
-      else {
+      } else {
         await apiClient
-        .register({ userName: userId , password: userPassword })
-        .then(res => {
-          if (res.registerSuccessfully) {
-            toast({
-              title: 'Registration Success',
-              description: 'Successfullty created an Account',
-              status: 'success',
-              isClosable: true,
-              duration: 3000,
-            });
-            dispatchUpdate({
-              action: 'finishRegistration',
-              data: {
-                isRegistering: false,
-              },
-            }); 
-            console.log('Register Success');
-          } else {
-            toast({
-              title: 'Unable to Register',
-              description: 'Account was same user name was already created!',
-              status: 'error',
-            });
-          }
-        })
-        .catch(err => {
-          throw err;
-        }); 
+          .register({ userName: userId, password: userPassword })
+          .then(res => {
+            if (res.registerSuccessfully) {
+              toast({
+                title: 'User Registered',
+                description: 'Successfullty created an account!',
+                status: 'success',
+                isClosable: true,
+                duration: 3000,
+              });
+              dispatchUpdate({
+                action: 'finishRegistration',
+                data: {
+                  isRegistering: false,
+                },
+              });
+            } else {
+              throw Error(res.errorMessage);
+            }
+          })
+          .catch(err => {
+            throw err;
+          });
       }
     } catch (err) {
       toast({
-        title: 'Error: ',
         description: err.toString(),
         status: 'error',
         isClosable: true,
@@ -164,6 +156,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
               placeholder='Create a Username'
               value={userId}
               onChange={event => setUserID(event.target.value)}
+              focusBorderColor='#5F2EEA'
             />
           </FormControl>
         </HStack>
@@ -178,6 +171,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
               placeholder='Create a Password'
               value={userPassword}
               onChange={event => setUserPassword(event.target.value)}
+              focusBorderColor='#5F2EEA'
             />
           </FormControl>
           <Button onClick={handleShow}>{show ? 'Hide' : 'Show'}</Button>
@@ -193,6 +187,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
               placeholder='Confirm Password'
               value={confirmPassword}
               onChange={event => setConfirmPassword(event.target.value)}
+              focusBorderColor='#5F2EEA'
             />
           </FormControl>
           <Button onClick={handleShowConfirmation}>{showConfirmation ? 'Hide' : 'Show'}</Button>
@@ -215,7 +210,7 @@ export default function Register({ dispatchUpdate }: InitialRegisterPageProps): 
           borderWidth='1px'
           as='kbd'
           width='20vw'
-          data-testid='RegisterButton'
+          data-testid='AccountExistsButton'
           onClick={handleAccountExists}>
           Already have an account?
         </Button>

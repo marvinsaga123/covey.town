@@ -21,8 +21,9 @@ export interface RegisterRequest {
 export interface RegisterResponse {
   /** Does a user exist with the sent userName and passord? */
   registerSuccessfully: boolean;
+  /** Error message if register was not successful */
+  errorMessage?: string;
 }
-
 
 /**
  * The format of a request to perform a friends list action on behalf of a user, as dispatched by server
@@ -216,10 +217,9 @@ export default class TownsServiceClient {
       '/register',
       requestData,
     );
+
     return TownsServiceClient.unwrapOrThrowError(responseWrapper);
   }
-
-
 
   async processFriendRequestAction(requestData: FriendRequest): Promise<void> {
     let responseWrapper: AxiosResponse<ResponseEnvelope<void>>;
