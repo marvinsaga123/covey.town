@@ -6,7 +6,6 @@ import CoveyTownsStore from '../lib/CoveyTownsStore';
 import CoveyTownListener from '../types/CoveyTownListener';
 import Player from '../types/Player';
 
-
 /**
  * The format of a request to register to Covey.Town, as dispatched by the server middleware
  */
@@ -24,6 +23,8 @@ export interface RegisterRequest {
 export interface RegisterResponse {
   /** Does a user exist with the sent userName and passord? */
   registerSuccessfully: boolean;
+  /** Error message if register was not successful */
+  errorMessage?: string;
 }
 
 /**
@@ -162,9 +163,6 @@ export interface ResponseEnvelope<T> {
   response?: T;
 }
 
-
-
-
 /**
  * A handler to process a player's request to join a town. The flow is:
  *  1. Client makes a TownJoinRequest, this handler is executed
@@ -247,25 +245,6 @@ export async function loginHandler(
   };
 }
 
-export async function registerHandler(
-  requestData: RegisterRequest,
-): Promise<ResponseEnvelope<RegisterResponse>> {
-  const databaseInstance = CoveyTownDatabase.getInstance();
-
-  const registerSuccessfully = await databaseInstance.processRegister(
-    requestData.userName,
-    requestData.password,
-  );
-
-  return {
-    isOK: true,
-    response: {
-      registerSuccessfully,
-    },
-  };
-}
-
-
 export async function acceptFriendRequestHandler(
   requestData: FriendRequest,
 ): Promise<ResponseEnvelope<Record<string, null>>> {
@@ -307,12 +286,12 @@ export async function performFriendsListAction(
 ): Promise<ResponseEnvelope<FriendsListActionResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
 
-  const friendsListResponseObject = await databaseInstance.processFriendsListAction(
+  const friendsListDatabaseResponseObject = await databaseInstance.processFriendsListAction(
     requestData.action.actionName,
     requestData.forUser,
   );
 
-  if (!friendsListResponseObject.success) {
+  if (!friendsListDatabaseResponseObject.success) {
     return {
       isOK: false,
       message: requestData.action.errorMessage,
@@ -321,7 +300,35 @@ export async function performFriendsListAction(
 
   return {
     isOK: true,
-    response: { listOfUsers: friendsListResponseObject.response },
+    response: { listOfUsers: friendsListDatabaseResponseObject.response },
+  };
+}
+
+export async function registerHandler(
+  requestData: RegisterRequest,
+): Promise<ResponseEnvelope<RegisterResponse>> {
+  const databaseInstance = CoveyTownDatabase.getInstance();
+
+  const registerDatabaseResponseObject = await databaseInstance.processRegister(
+    requestData.userName,
+    requestData.password,
+  );
+
+  if (!registerDatabaseResponseObject.success) {
+    return {
+      isOK: true,
+      response: {
+        registerSuccessfully: false,
+        errorMessage: registerDatabaseResponseObject.errorMessage,
+      },
+    };
+  }
+
+  return {
+    isOK: true,
+    response: {
+      registerSuccessfully: true,
+    },
   };
 }
 

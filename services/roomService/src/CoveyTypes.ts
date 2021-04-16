@@ -23,7 +23,12 @@ export type FriendsListAction = {
   errorMessage: string;
 };
 
-export type FriendsListResponse = {
+export type FriendsListDatabaseResponse = {
   success: boolean;
   response: string[];
+};
+
+export type RegisterDatabaseResponse = {
+  success: boolean;
+  errorMessage?: string;
 };
