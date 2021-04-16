@@ -1,4 +1,4 @@
-# Covey.Town CS4530 Final Project
+# Covey.Town CS4530 Final Project README
 
 Covey.Town provides a virtual meeting space where different groups of people can have simultaneous video calls, allowing participants to drift between different conversations, just like in real life. This version was built on top of the Covey.Town repo built for Northeastern's [Spring 2021 software engineering course](https://neu-se.github.io/CS4530-CS5500-Spring-2021/).
 You can view our reference deployment of the app at [peaceful-brattain-c5eb8c.netlify.app](https://peaceful-brattain-c5eb8c.netlify.app/).
