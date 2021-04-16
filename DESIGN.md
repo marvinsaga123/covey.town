@@ -28,9 +28,11 @@ The previous implementation of the `RoomsService` from the original repository w
 
 #### New Features Handled by `UserService`
 
-- WIP
-- WIP
-- WIP
+**Note:** our login, logout and registration system is a barebones system that does not employ authentication, and authentication was never a part of the user story to implement this feature. However, were we to release this to the public, we would ideally integrate an authentication service to make our login system more robust.
+
+- Registering an account in Covey.Town
+- Logging in to Covey.Town
+- Logging out of Covey.Town
 
 ### `FriendsService`
 
