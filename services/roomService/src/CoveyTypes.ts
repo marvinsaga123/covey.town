@@ -27,6 +27,7 @@ export type Friend = {
   username: string;
   online: boolean;
   room: string;
+  roomId?: string;
   requestSender: string;
   requestRecipient: string;
 };

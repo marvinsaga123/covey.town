@@ -346,6 +346,7 @@ export default class CoveyTownDatabase {
                   username: row.username,
                   online: true,
                   room: row.current_room,
+                  roomId: row.room_id,
                   requestSender: '',
                   requestRecipient: '',
                 };
