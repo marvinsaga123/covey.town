@@ -12,7 +12,9 @@ import Typography from '@material-ui/core/Typography';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import React, { useState } from 'react';
 import { Friend } from '../../../classes/FriendsServiceClient';
+import Video from '../../../classes/Video/Video';
 import useCoveyAppState from '../../../hooks/useCoveyAppState';
+import useVideoContext from '../../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
 
 export default function FriendsInfoButton(): JSX.Element {
   const [fetchedUsers, setFetchedUsers] = useState<Friend[]>([]);
@@ -22,6 +24,7 @@ export default function FriendsInfoButton(): JSX.Element {
   const [respondedRequest, setRespondedRequest] = React.useState<number[]>([]);
   const [cancelledRequest, setCancelledRequest] = React.useState<number[]>([]);
   const { userName, friendsClient } = useCoveyAppState();
+  const { connect } = useVideoContext();
   const toast = useToast();
 
   const handleOpen = () => {
@@ -179,6 +182,20 @@ export default function FriendsInfoButton(): JSX.Element {
     }
   };
 
+  const handleJoinRoom = async (room: string) => {
+    try {
+      const initData = await Video.setup(userName, room);
+
+      await connect(initData.providerVideoToken);
+    } catch (err) {
+      toast({
+        title: 'Unable to connect to Towns Service',
+        description: err.toString(),
+        status: 'error',
+      });
+    }
+  }
+
   return (
     <Button
       onClick={handleOpen}
@@ -252,7 +269,8 @@ export default function FriendsInfoButton(): JSX.Element {
                               colorScheme='purple'
                               height='34px'
                               width='12vw'
-                              borderRadius='40px'>
+                              borderRadius='40px'
+                              onClick={() => handleJoinRoom(user.roomId!)}>
                               Join Room&nbsp;<b>[ {user.room} ] </b>
                             </Button>
                             &nbsp;&nbsp;
