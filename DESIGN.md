@@ -64,11 +64,36 @@ In addition to app state and backend services additions, a number of Frontend up
 
 ### Architecture
 
-[ WIP ] - Rachel
+This feature uses a PostgreSQL database to store user, friend, and town information. Here is a description of the tables used: 
+
+#### Users Table: users
+- id: integer
+- username: text
+- password: text
+- current_room: text
+- room_id: text
+
+This table was used to store all information related to user accounts. User entries are created whenever a new user registers for an account. The current_room and room_id fields are updated to the room info for the room a user is currently in, as they interact with Covey.Town. This is used to represent the user's online status. 
+
+#### Friends Table: friends
+- id: integer
+- sender_id: text
+- recipient_id: text
+- timestamp: timestamp with time zone
+
+This table was used to store all information related to friendships between users. It records which user sent a friend request to another user and the timestamp at which the friend request was accepted by the recipient, which is also when the Friends table entry was created. If a user removes a friend, the corresponding entry is deleted from this table.
+
+#### Friend Requests Table: friend_requests
+- id: integer
+- sender_id: text
+- recipient_id: text
+- timestamp: timestamp with time zone
+
+This table was used to store all information related to friend requests between users. It records which user sent a friend request to another user and the timestamp at which the friend request was sent by the recipient, which is also when the Friend Requests table entry was created. Entries are deleted when a recipient user accepts or denies a request or when a sender user cancels an outgoing friend request. If the friend request was accepted, a row is added to the Friends table with the corresponding information.
 
 ### Communication with Backend
 
-[ WIP ] - Rachel
+We used the "pg" node library to connect to and run queries on our database, using the database url, which was stored as an environment variable. All database related functionality is located in services/roomService/src/lib/CoveyTownDatabase.ts, which defines the database object. In services/roomService/src/requestHandlers/CoveyTownRequestHandlers.ts, a database instance in instantiated in each handler and then used to call the appropriate CoveyTownDatabase.ts method, each of which handles a different query to run against the database. The results of these queries are then returned to the handlers in CoveyTownRequestHandlers.ts and passed to the frontend through the response objects.
 
 ## Live Deployment
 
