@@ -41,7 +41,7 @@ export interface FriendsListActionResponse {
 /**
  * The format of a request to accept or deny a friend request, as dispatched by server middleware
  */
-export interface FriendRequest {
+export interface IncomingFriendRequestActionData {
   /** is the recipient accepting or denying the friend request? */
   action: string;
   /** username of the player who sent the friend request */
@@ -53,7 +53,7 @@ export interface FriendRequest {
 /**
  * The format of a request to send a friend request, as dispatched by sever middleware
  */
-export interface AddFriendRequest {
+export interface SendFriendRequestData {
   /** userName to be searched for */
   recipient: string;
   sender: string;
@@ -63,22 +63,23 @@ export interface AddFriendRequest {
  * The format of a response to send a friend request, as dispatched by the handler to the server
  * middleware
  */
-export interface AddFriendResponse {
+export interface SendFriendRequestResponse {
   /** Does a user exist that matches the given username? */
   requestSentSuccess: boolean;
 }
 
 /**
- * The format of a request to cancel a friend request, as dispatched by sever middleware
+ * The format of a request to cancel a friend request or remove a current friend, as dispatched by
+ * sever middleware
  */
-export interface RemoveFriendRequest {
+export interface RemoveFriendRequestData {
   /** userName to be searched for */
   friend: string;
   user: string;
 }
 
 /**
- * The format of a response to cancel a friend reques or remove a current friend, as dispatched by the
+ * The format of a response to cancel a friend request or remove a current friend, as dispatched by the
  * handler to the server middleware
  */
 export interface RemoveFriendResponse {
@@ -312,8 +313,8 @@ export async function loginHandler(
 }
 
 export async function acceptFriendRequestHandler(
-  requestData: FriendRequest,
-): Promise<ResponseEnvelope<AddFriendResponse>> {
+  requestData: IncomingFriendRequestActionData,
+): Promise<ResponseEnvelope<SendFriendRequestResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
 
   const success = await databaseInstance.processFriendRequestAction(
@@ -330,8 +331,8 @@ export async function acceptFriendRequestHandler(
 }
 
 export async function denyFriendRequestHandler(
-  requestData: FriendRequest,
-): Promise<ResponseEnvelope<AddFriendResponse>> {
+  requestData: IncomingFriendRequestActionData,
+): Promise<ResponseEnvelope<SendFriendRequestResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
 
   const success = await databaseInstance.processFriendRequestAction(
@@ -415,8 +416,8 @@ export async function performUserSearchAction(
 }
 
 export async function sendFriendRequestHandler(
-  requestData: AddFriendRequest,
-): Promise<ResponseEnvelope<AddFriendResponse>> {
+  requestData: SendFriendRequestData,
+): Promise<ResponseEnvelope<SendFriendRequestResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
 
   const addFriendResponseObject = await databaseInstance.sendFriendRequest(
@@ -431,7 +432,7 @@ export async function sendFriendRequestHandler(
 }
 
 export async function removeFriendHandler(
-  requestData: RemoveFriendRequest,
+  requestData: RemoveFriendRequestData,
 ): Promise<ResponseEnvelope<RemoveFriendResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
 
@@ -447,7 +448,7 @@ export async function removeFriendHandler(
 }
 
 export async function cancelFriendRequestHandler(
-  requestData: FriendRequest,
+  requestData: IncomingFriendRequestActionData,
 ): Promise<ResponseEnvelope<RemoveFriendResponse>> {
   const databaseInstance = CoveyTownDatabase.getInstance();
 

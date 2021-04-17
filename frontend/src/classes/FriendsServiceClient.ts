@@ -33,7 +33,7 @@ export interface FriendsListActionResponse {
 /**
  * The format of a request to accept or deny a friend request, as dispatched by server middleware
  */
-export interface FriendRequest {
+export interface IncomingFriendRequestActionData {
   /** is the recipient accepting or denying the friend request? */
   action: string;
   /** username of the player who sent the friend request */
@@ -45,9 +45,10 @@ export interface FriendRequest {
 /**
  * The format of a request to send a friend request, as dispatched by sever middleware
  */
-export interface AddFriendRequest {
-  /** userName to be searched for */
+export interface SendFriendRequestData {
+  /** user to send a friend request to */
   recipient: string;
+  /** user who is sending the friend request */
   sender: string;
 }
 
@@ -55,22 +56,24 @@ export interface AddFriendRequest {
  * The format of a response to send a friend request, as dispatched by the handler to the server
  * middleware
  */
-export interface AddFriendResponse {
+export interface SendFriendRequestResponse {
   /** Does a user exist that matches the given username? */
   requestSentSuccess: boolean;
 }
 
 /**
- * The format of a request to cancel a friend request, as dispatched by sever middleware
+ * The format of a request to cancel a friend request or remove a current friend, as dispatched by
+ * sever middleware
  */
-export interface RemoveFriendRequest {
-  /** userName to be searched for */
+export interface RemoveFriendRequestData {
+  /** user who received the friend request that will be cancelled */
   friend: string;
+  /** user who is cancelling the friend request */
   user: string;
 }
 
 /**
- * The format of a response to cancel a friend reques or remove a current friend, as dispatched by the
+ * The format of a response to cancel a friend request or remove a current friend, as dispatched by the
  * handler to the server middleware
  */
 export interface RemoveFriendResponse {
@@ -123,7 +126,9 @@ export default class FriendsServiceClient {
   }
 
   // accepting or denying a friend quest
-  async processIncomingFriendRequestAction(requestData: FriendRequest): Promise<void> {
+  async processIncomingFriendRequestAction(
+    requestData: IncomingFriendRequestActionData,
+  ): Promise<void> {
     let responseWrapper: AxiosResponse<ResponseEnvelope<void>>;
 
     if (requestData.action === 'accept') {
@@ -160,8 +165,10 @@ export default class FriendsServiceClient {
   }
 
   // send a friend request to a user
-  async sendOutgoingFriendRequest(requestData: AddFriendRequest): Promise<AddFriendResponse> {
-    const responseWrapper = await this._axios.post<ResponseEnvelope<AddFriendResponse>>(
+  async sendOutgoingFriendRequest(
+    requestData: SendFriendRequestData,
+  ): Promise<SendFriendRequestResponse> {
+    const responseWrapper = await this._axios.post<ResponseEnvelope<SendFriendRequestResponse>>(
       '/sendOutgoingFriendRequest',
       requestData,
     );
@@ -169,7 +176,9 @@ export default class FriendsServiceClient {
   }
 
   // cancel a friend request to a user
-  async cancelOutgoingFriendRequest(requestData: FriendRequest): Promise<RemoveFriendResponse> {
+  async cancelOutgoingFriendRequest(
+    requestData: IncomingFriendRequestActionData,
+  ): Promise<RemoveFriendResponse> {
     const responseWrapper = await this._axios.post<ResponseEnvelope<RemoveFriendResponse>>(
       '/cancelFriendRequest',
       requestData,
@@ -178,7 +187,7 @@ export default class FriendsServiceClient {
   }
 
   // remove a user from a user's friends list
-  async removeFriend(requestData: RemoveFriendRequest): Promise<RemoveFriendResponse> {
+  async removeFriend(requestData: RemoveFriendRequestData): Promise<RemoveFriendResponse> {
     const responseWrapper = await this._axios.post<ResponseEnvelope<RemoveFriendResponse>>(
       '/removeFriend',
       requestData,
