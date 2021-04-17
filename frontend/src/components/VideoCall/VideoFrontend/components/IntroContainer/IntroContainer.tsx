@@ -1,6 +1,7 @@
 import { Button, HStack, VStack } from '@chakra-ui/react';
 import { makeStyles, Theme } from '@material-ui/core';
 import React from 'react';
+import { TownJoinResponse } from '../../../../../classes/TownsServiceClient';
 import { CoveyAppUpdate } from '../../../../../CoveyTypes';
 import useCoveyAppState from '../../../../../hooks/useCoveyAppState';
 import FriendsInfoButton from '../../../../Buttons/FriendsInfoButton/FriendsInfoButton';
@@ -45,12 +46,14 @@ interface IntroContainerProps {
   children: React.ReactNode;
   subContent?: React.ReactNode;
   dispatchUpdate: (update: CoveyAppUpdate) => void;
+  doLogin: (initData: TownJoinResponse) => Promise<boolean>;
 }
 
 const IntroContainer = ({
   children,
   subContent,
   dispatchUpdate,
+  doLogin,
 }: IntroContainerProps): JSX.Element => {
   const { userName: appStateUserName } = useCoveyAppState();
   const classes = useStyles();
@@ -93,7 +96,7 @@ const IntroContainer = ({
             </VStack>
             <VStack spacing={2}>
               <SearchUsersButton />
-              <FriendsInfoButton />
+              <FriendsInfoButton doLogin={doLogin} />
             </VStack>
           </HStack>
 

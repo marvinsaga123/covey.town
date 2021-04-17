@@ -281,7 +281,7 @@ function App(props: { setOnDisconnect: Dispatch<SetStateAction<Callback | undefi
           <VStack flex={1} alignItems='stretch' height='80vh' paddingRight='0.5em'>
             <CurrentVideoChatUsersList />
             <SearchUsersButton />
-            <FriendsInfoButton />
+            <FriendsInfoButton doLogin={setupGameController} />
           </VStack>
         </HStack>
         <VideoOverlay preferredMode='fullwidth' dispatchUpdate={dispatchAppUpdate} />

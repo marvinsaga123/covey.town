@@ -392,4 +392,20 @@ export default class CoveyTownDatabase {
       };
     }
   }
+
+  async updateUserCurrentRoom(
+    userName: string,
+    roomName: string,
+    roomId: string,
+  ): Promise<boolean> {
+    const query = 'UPDATE users SET current_room=$1, room_id=$2 WHERE username=$3';
+    const queryValues = [roomName, roomId, userName];
+
+    try {
+      await this.client.query(query, queryValues);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
 }
