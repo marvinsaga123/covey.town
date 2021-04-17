@@ -2,7 +2,7 @@
 
 ## High Level Architecture
 
-![High Level Architecture Diagram](High-Level-Architecture.png)
+![High Level Architecture Diagram](Architecture-Overview.png)
 
 **Architecture Updates as of 4/16:**
 
