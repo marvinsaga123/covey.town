@@ -18,7 +18,7 @@ export default function PreJoinScreens({
   dispatchUpdate,
 }: PreJoinScreensProps): JSX.Element {
   return (
-    <IntroContainer dispatchUpdate={dispatchUpdate}>
+    <IntroContainer dispatchUpdate={dispatchUpdate} doLogin={doLogin}>
       <Heading as='h2' size='xl'>
         Welcome to Covey.Town!
       </Heading>

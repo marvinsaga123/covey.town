@@ -15,6 +15,7 @@ type Friend = {
   username: string;
   online: boolean;
   room: string;
+  roomId?: string;
   requestSender: string;
   requestRecipient: string;
 };
@@ -242,6 +243,7 @@ export async function townJoinHandler(
   requestData: TownJoinRequest,
 ): Promise<ResponseEnvelope<TownJoinResponse>> {
   const townsStore = CoveyTownsStore.getInstance();
+  const databaseInstance = CoveyTownDatabase.getInstance();
 
   const coveyTownController = townsStore.getControllerForTown(requestData.coveyTownID);
   if (!coveyTownController) {
@@ -250,6 +252,13 @@ export async function townJoinHandler(
       message: 'Error: No such town',
     };
   }
+
+  await databaseInstance.updateUserCurrentRoom(
+    requestData.userName,
+    coveyTownController.friendlyName,
+    coveyTownController.coveyTownID,
+  );
+
   const newPlayer = new Player(requestData.userName);
   const newSession = await coveyTownController.addPlayer(newPlayer);
   assert(newSession.videoToken);
@@ -548,7 +557,7 @@ export function townSubscriptionHandler(socket: Socket): void {
   // Register an event listener for the client socket: if the client disconnects,
   // clean up our listener adapter, and then let the CoveyTownController know that the
   // player's session is disconnected
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
     townController.removeTownListener(listener);
     townController.destroySession(s);
   });

@@ -10,11 +10,19 @@ import {
 } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
+import assert from 'assert';
 import React, { useState } from 'react';
 import { Friend } from '../../../classes/FriendsServiceClient';
+import { TownJoinResponse } from '../../../classes/TownsServiceClient';
+import Video from '../../../classes/Video/Video';
 import useCoveyAppState from '../../../hooks/useCoveyAppState';
+import useVideoContext from '../../VideoCall/VideoFrontend/hooks/useVideoContext/useVideoContext';
 
-export default function FriendsInfoButton(): JSX.Element {
+interface FriendsInfoButtonProps {
+  doLogin: (initData: TownJoinResponse) => Promise<boolean>;
+}
+
+export default function FriendsInfoButton({ doLogin }: FriendsInfoButtonProps): JSX.Element {
   const [fetchedUsers, setFetchedUsers] = useState<Friend[]>([]);
   const [open, setOpen] = React.useState<boolean>(false);
   const [menuType, setMenuType] = React.useState<string>('');
@@ -22,6 +30,7 @@ export default function FriendsInfoButton(): JSX.Element {
   const [respondedRequest, setRespondedRequest] = React.useState<number[]>([]);
   const [cancelledRequest, setCancelledRequest] = React.useState<number[]>([]);
   const { userName, friendsClient } = useCoveyAppState();
+  const { connect } = useVideoContext();
   const toast = useToast();
 
   const handleOpen = () => {
@@ -179,6 +188,24 @@ export default function FriendsInfoButton(): JSX.Element {
     }
   };
 
+  const handleJoinRoom = async (room: string) => {
+    try {
+      const initData = await Video.setup(userName, room);
+
+      const loggedIn = await doLogin(initData);
+      if (loggedIn) {
+        assert(initData.providerVideoToken);
+        await connect(initData.providerVideoToken);
+      }
+    } catch (err) {
+      toast({
+        title: 'Unable to connect to Towns Service',
+        description: err.toString(),
+        status: 'error',
+      });
+    }
+  };
+
   return (
     <Button
       onClick={handleOpen}
@@ -252,7 +279,8 @@ export default function FriendsInfoButton(): JSX.Element {
                               colorScheme='purple'
                               height='34px'
                               width='12vw'
-                              borderRadius='40px'>
+                              borderRadius='40px'
+                              onClick={() => handleJoinRoom(user.roomId ?? '')}>
                               Join Room&nbsp;<b>[ {user.room} ] </b>
                             </Button>
                             &nbsp;&nbsp;
