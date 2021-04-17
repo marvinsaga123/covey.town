@@ -104,9 +104,11 @@ function wrappedTownSelection() {
             moving: false,
           },
           emitMovement: () => {},
-          townsClient: new TownsServiceClient(),
-          userClient: new UserServiceClient(),
-          friendsClient: new FriendsServiceClient(),
+          townsClient: new TownsServiceClient('https://covey-town-final-project.herokuapp.com/'),
+          userClient: new UserServiceClient('https://covey-town-final-project.herokuapp.com/'),
+          friendsClient: new FriendsServiceClient(
+            'https://covey-town-final-project.herokuapp.com/',
+          ),
           isRegistering: false,
           isLoggedIn: false,
         }}>
